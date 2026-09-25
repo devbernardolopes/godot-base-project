@@ -34,7 +34,7 @@ var _current: StringName = PANEL_MAIN
 	PANEL_SLOTS: $Center/Card/Margin/SlotsPanel/Slot1Button,
 	PANEL_SETTINGS: $Center/Card/Margin/SettingsPanel/ControlsButton,
 	PANEL_CONTROLS: $Center/Card/Margin/ControlsPanel/ControlsBackButton,
-	PANEL_VIDEO: $Center/Card/Margin/VideoPanel/VideoBackButton,
+	PANEL_VIDEO: $Center/Card/Margin/VideoPanel/ModeRow/ModeOption,
 	PANEL_AUDIO: $Center/Card/Margin/AudioPanel/SoundRow/SoundSlider,
 }
 
@@ -63,7 +63,13 @@ var _current: StringName = PANEL_MAIN
 @onready var _controls_wip: Label = $Center/Card/Margin/ControlsPanel/ControlsWip
 @onready var _controls_back_button: Button = $Center/Card/Margin/ControlsPanel/ControlsBackButton
 @onready var _video_title: Label = $Center/Card/Margin/VideoPanel/VideoTitle
-@onready var _video_wip: Label = $Center/Card/Margin/VideoPanel/VideoWip
+@onready var _mode_row: HBoxContainer = $Center/Card/Margin/VideoPanel/ModeRow
+@onready var _mode_label: Label = $Center/Card/Margin/VideoPanel/ModeRow/ModeLabel
+@onready var _mode_option: OptionButton = $Center/Card/Margin/VideoPanel/ModeRow/ModeOption
+@onready var _res_row: HBoxContainer = $Center/Card/Margin/VideoPanel/ResRow
+@onready var _res_label: Label = $Center/Card/Margin/VideoPanel/ResRow/ResLabel
+@onready var _res_option: OptionButton = $Center/Card/Margin/VideoPanel/ResRow/ResOption
+@onready var _video_auto: Label = $Center/Card/Margin/VideoPanel/VideoAuto
 @onready var _video_back_button: Button = $Center/Card/Margin/VideoPanel/VideoBackButton
 @onready var _audio_title: Label = $Center/Card/Margin/AudioPanel/AudioTitle
 @onready var _sound_label: Label = $Center/Card/Margin/AudioPanel/SoundRow/SoundLabel
@@ -115,6 +121,8 @@ func show_panel(panel: StringName, push: bool = true) -> void:
 		_refresh_slots()
 	if panel == PANEL_AUDIO:
 		_refresh_audio()
+	if panel == PANEL_VIDEO:
+		_refresh_video()
 	var first: Control = _first_focus.get(panel)
 	if first != null:
 		first.grab_focus()
@@ -209,6 +217,50 @@ func _on_test_sound() -> void:
 #endregion
 
 
+#region VIDEO
+
+func _find_resolution_index() -> int:
+	for i: int in range(Gm.SUPPORTED_RESOLUTIONS.size()):
+		var r: Vector2i = Gm.SUPPORTED_RESOLUTIONS[i]
+		if r.x == Gm.video_res_w and r.y == Gm.video_res_h:
+			return i
+	return 0
+
+func _fill_video_options() -> void:
+	_mode_option.clear()
+	_mode_option.add_item(tr("VIDEO_EXCLUSIVE"), 0)
+	_mode_option.add_item(tr("VIDEO_WINDOWED"), 1)
+	_mode_option.add_item(tr("VIDEO_BORDERLESS"), 2)
+	_res_option.clear()
+	for i: int in range(Gm.SUPPORTED_RESOLUTIONS.size()):
+		var r: Vector2i = Gm.SUPPORTED_RESOLUTIONS[i]
+		_res_option.add_item("%d x %d" % [r.x, r.y], i)
+
+func _refresh_video() -> void:
+	var adaptive: bool = OS.has_feature("web") or Gm.is_mobile()
+	_mode_row.visible = not adaptive
+	_res_row.visible = not adaptive
+	_video_auto.visible = adaptive
+	if adaptive:
+		return
+	_mode_option.selected = clampi(Gm.video_style, 0, 2)
+	_res_option.selected = _find_resolution_index()
+
+func _on_mode_selected(index: int) -> void:
+	Gm.video_style = clampi(index, 0, 2)
+	Gm.apply_video_settings()
+	Gm.save_settings()
+
+func _on_resolution_selected(index: int) -> void:
+	var r: Vector2i = Gm.SUPPORTED_RESOLUTIONS[clampi(index, 0, Gm.SUPPORTED_RESOLUTIONS.size() - 1)]
+	Gm.video_res_w = r.x
+	Gm.video_res_h = r.y
+	Gm.apply_video_settings()
+	Gm.save_settings()
+
+#endregion
+
+
 #region EXIT
 
 func _on_exit_pressed() -> void:
@@ -245,12 +297,17 @@ func _retranslate() -> void:
 	_settings_back_button.text = tr("MENU_BACK")
 	_controls_title.text = tr("CONTROLS_TITLE")
 	_video_title.text = tr("VIDEO_TITLE")
+	_mode_label.text = tr("VIDEO_MODE")
+	_res_label.text = tr("VIDEO_RESOLUTION")
+	_video_auto.text = tr("VIDEO_AUTO")
+	_fill_video_options()
+	_refresh_video()
 	_audio_title.text = tr("AUDIO_TITLE")
 	_sound_label.text = tr("AUDIO_SOUND")
 	_music_label.text = tr("AUDIO_MUSIC")
 	_test_sound_button.text = tr("AUDIO_TEST")
 	_update_audio_labels()
-	for wip: Label in [_controls_wip, _video_wip]:
+	for wip: Label in [_controls_wip]:
 		wip.text = tr("WIP")
 	_controls_back_button.text = tr("MENU_BACK")
 	_video_back_button.text = tr("MENU_BACK")
@@ -286,4 +343,6 @@ func _connect_signals() -> void:
 	_sound_slider.drag_ended.connect(_on_audio_drag_ended)
 	_music_slider.drag_ended.connect(_on_audio_drag_ended)
 	_test_sound_button.pressed.connect(_on_test_sound)
+	_mode_option.item_selected.connect(_on_mode_selected)
+	_res_option.item_selected.connect(_on_resolution_selected)
 	_exit_dialog.confirmed.connect(_on_exit_confirmed)

@@ -132,9 +132,31 @@ layout_mode = 2
 text = "Video"
 horizontal_alignment = 1
 
-[node name="VideoWip" type="Label" parent="Center/Card/Margin/VideoPanel" unique_id=351409685]
+[node name="ModeRow" type="HBoxContainer" parent="Center/Card/Margin/VideoPanel" unique_id=75512391]
 layout_mode = 2
-text = "Coming soon."
+theme_override_constants/separation = 8
+
+[node name="ModeLabel" type="Label" parent="Center/Card/Margin/VideoPanel/ModeRow" unique_id=2043804538]
+layout_mode = 2
+text = "Window style"
+
+[node name="ModeOption" type="OptionButton" parent="Center/Card/Margin/VideoPanel/ModeRow" unique_id=1960171557]
+layout_mode = 2
+
+[node name="ResRow" type="HBoxContainer" parent="Center/Card/Margin/VideoPanel" unique_id=454374000]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ResLabel" type="Label" parent="Center/Card/Margin/VideoPanel/ResRow" unique_id=2038618519]
+layout_mode = 2
+text = "Resolution"
+
+[node name="ResOption" type="OptionButton" parent="Center/Card/Margin/VideoPanel/ResRow" unique_id=1375730729]
+layout_mode = 2
+
+[node name="VideoAuto" type="Label" parent="Center/Card/Margin/VideoPanel" unique_id=1954038470]
+layout_mode = 2
+text = "Window is managed by the system."
 
 [node name="VideoBackButton" type="Button" parent="Center/Card/Margin/VideoPanel" unique_id=789393550]
 layout_mode = 2
