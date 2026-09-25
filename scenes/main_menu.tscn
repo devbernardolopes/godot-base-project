@@ -115,11 +115,219 @@ layout_mode = 2
 text = "Controls"
 horizontal_alignment = 1
 
-[node name="ControlsWip" type="Label" parent="Center/Card/Margin/ControlsPanel" unique_id=1890449266]
+[node name="HeaderRow" type="HBoxContainer" parent="Center/Card/Margin/ControlsPanel" unique_id=1314127074]
 layout_mode = 2
-text = "Coming soon."
+theme_override_constants/separation = 8
 
-[node name="ControlsBackButton" type="Button" parent="Center/Card/Margin/ControlsPanel" unique_id=1527832793]
+[node name="HAction" type="Label" parent="Center/Card/Margin/ControlsPanel/HeaderRow" unique_id=49427281]
+layout_mode = 2
+text = "Action"
+
+[node name="HKey" type="Label" parent="Center/Card/Margin/ControlsPanel/HeaderRow" unique_id=1097835219]
+layout_mode = 2
+text = "Key"
+
+[node name="HPad" type="Label" parent="Center/Card/Margin/ControlsPanel/HeaderRow" unique_id=1402547677]
+layout_mode = 2
+text = "Pad"
+
+[node name="RowMoveUp" type="HBoxContainer" parent="Center/Card/Margin/ControlsPanel" unique_id=1924972966]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RowName" type="Label" parent="Center/Card/Margin/ControlsPanel/RowMoveUp" unique_id=1507340753]
+layout_mode = 2
+text = "Up"
+
+[node name="KeyButton" type="Button" parent="Center/Card/Margin/ControlsPanel/RowMoveUp" unique_id=414885680]
+layout_mode = 2
+
+[node name="PadButton" type="Button" parent="Center/Card/Margin/ControlsPanel/RowMoveUp" unique_id=2045875216]
+layout_mode = 2
+
+[node name="PadGlyph" type="TextureRect" parent="Center/Card/Margin/ControlsPanel/RowMoveUp/PadButton" unique_id=1034039781]
+layout_mode = 0
+
+[node name="PadEmpty" type="Label" parent="Center/Card/Margin/ControlsPanel/RowMoveUp/PadButton" unique_id=981710021]
+layout_mode = 0
+text = "?"
+
+[node name="RowMoveDown" type="HBoxContainer" parent="Center/Card/Margin/ControlsPanel" unique_id=1218642511]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RowName" type="Label" parent="Center/Card/Margin/ControlsPanel/RowMoveDown" unique_id=370407373]
+layout_mode = 2
+text = "Down"
+
+[node name="KeyButton" type="Button" parent="Center/Card/Margin/ControlsPanel/RowMoveDown" unique_id=1960564387]
+layout_mode = 2
+
+[node name="PadButton" type="Button" parent="Center/Card/Margin/ControlsPanel/RowMoveDown" unique_id=1266339768]
+layout_mode = 2
+
+[node name="PadGlyph" type="TextureRect" parent="Center/Card/Margin/ControlsPanel/RowMoveDown/PadButton" unique_id=339197132]
+layout_mode = 0
+
+[node name="PadEmpty" type="Label" parent="Center/Card/Margin/ControlsPanel/RowMoveDown/PadButton" unique_id=1887855511]
+layout_mode = 0
+text = "?"
+
+[node name="RowMoveLeft" type="HBoxContainer" parent="Center/Card/Margin/ControlsPanel" unique_id=513773130]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RowName" type="Label" parent="Center/Card/Margin/ControlsPanel/RowMoveLeft" unique_id=276162400]
+layout_mode = 2
+text = "Left"
+
+[node name="KeyButton" type="Button" parent="Center/Card/Margin/ControlsPanel/RowMoveLeft" unique_id=903915659]
+layout_mode = 2
+
+[node name="PadButton" type="Button" parent="Center/Card/Margin/ControlsPanel/RowMoveLeft" unique_id=726738204]
+layout_mode = 2
+
+[node name="PadGlyph" type="TextureRect" parent="Center/Card/Margin/ControlsPanel/RowMoveLeft/PadButton" unique_id=783688698]
+layout_mode = 0
+
+[node name="PadEmpty" type="Label" parent="Center/Card/Margin/ControlsPanel/RowMoveLeft/PadButton" unique_id=1764166601]
+layout_mode = 0
+text = "?"
+
+[node name="RowMoveRight" type="HBoxContainer" parent="Center/Card/Margin/ControlsPanel" unique_id=1344323707]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RowName" type="Label" parent="Center/Card/Margin/ControlsPanel/RowMoveRight" unique_id=835632256]
+layout_mode = 2
+text = "Right"
+
+[node name="KeyButton" type="Button" parent="Center/Card/Margin/ControlsPanel/RowMoveRight" unique_id=751869554]
+layout_mode = 2
+
+[node name="PadButton" type="Button" parent="Center/Card/Margin/ControlsPanel/RowMoveRight" unique_id=320872614]
+layout_mode = 2
+
+[node name="PadGlyph" type="TextureRect" parent="Center/Card/Margin/ControlsPanel/RowMoveRight/PadButton" unique_id=255055809]
+layout_mode = 0
+
+[node name="PadEmpty" type="Label" parent="Center/Card/Margin/ControlsPanel/RowMoveRight/PadButton" unique_id=1306439599]
+layout_mode = 0
+text = "?"
+
+[node name="RowJump" type="HBoxContainer" parent="Center/Card/Margin/ControlsPanel" unique_id=185598567]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RowName" type="Label" parent="Center/Card/Margin/ControlsPanel/RowJump" unique_id=398663805]
+layout_mode = 2
+text = "Jump"
+
+[node name="KeyButton" type="Button" parent="Center/Card/Margin/ControlsPanel/RowJump" unique_id=2096546073]
+layout_mode = 2
+
+[node name="PadButton" type="Button" parent="Center/Card/Margin/ControlsPanel/RowJump" unique_id=1248507274]
+layout_mode = 2
+
+[node name="PadGlyph" type="TextureRect" parent="Center/Card/Margin/ControlsPanel/RowJump/PadButton" unique_id=1254642782]
+layout_mode = 0
+
+[node name="PadEmpty" type="Label" parent="Center/Card/Margin/ControlsPanel/RowJump/PadButton" unique_id=1184002017]
+layout_mode = 0
+text = "?"
+
+[node name="RowFire" type="HBoxContainer" parent="Center/Card/Margin/ControlsPanel" unique_id=1706827912]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RowName" type="Label" parent="Center/Card/Margin/ControlsPanel/RowFire" unique_id=2040037800]
+layout_mode = 2
+text = "Fire"
+
+[node name="KeyButton" type="Button" parent="Center/Card/Margin/ControlsPanel/RowFire" unique_id=1624665323]
+layout_mode = 2
+
+[node name="PadButton" type="Button" parent="Center/Card/Margin/ControlsPanel/RowFire" unique_id=1545771007]
+layout_mode = 2
+
+[node name="PadGlyph" type="TextureRect" parent="Center/Card/Margin/ControlsPanel/RowFire/PadButton" unique_id=287253042]
+layout_mode = 0
+
+[node name="PadEmpty" type="Label" parent="Center/Card/Margin/ControlsPanel/RowFire/PadButton" unique_id=1603457729]
+layout_mode = 0
+text = "?"
+
+[node name="RowDash" type="HBoxContainer" parent="Center/Card/Margin/ControlsPanel" unique_id=360302493]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RowName" type="Label" parent="Center/Card/Margin/ControlsPanel/RowDash" unique_id=1338999427]
+layout_mode = 2
+text = "Dash"
+
+[node name="KeyButton" type="Button" parent="Center/Card/Margin/ControlsPanel/RowDash" unique_id=686408228]
+layout_mode = 2
+
+[node name="PadButton" type="Button" parent="Center/Card/Margin/ControlsPanel/RowDash" unique_id=1454990752]
+layout_mode = 2
+
+[node name="PadGlyph" type="TextureRect" parent="Center/Card/Margin/ControlsPanel/RowDash/PadButton" unique_id=1515523253]
+layout_mode = 0
+
+[node name="PadEmpty" type="Label" parent="Center/Card/Margin/ControlsPanel/RowDash/PadButton" unique_id=1961661557]
+layout_mode = 0
+text = "?"
+
+[node name="RowMap" type="HBoxContainer" parent="Center/Card/Margin/ControlsPanel" unique_id=1482989607]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RowName" type="Label" parent="Center/Card/Margin/ControlsPanel/RowMap" unique_id=58840560]
+layout_mode = 2
+text = "Map"
+
+[node name="KeyButton" type="Button" parent="Center/Card/Margin/ControlsPanel/RowMap" unique_id=263857981]
+layout_mode = 2
+
+[node name="PadButton" type="Button" parent="Center/Card/Margin/ControlsPanel/RowMap" unique_id=960956954]
+layout_mode = 2
+
+[node name="PadGlyph" type="TextureRect" parent="Center/Card/Margin/ControlsPanel/RowMap/PadButton" unique_id=1774982773]
+layout_mode = 0
+
+[node name="PadEmpty" type="Label" parent="Center/Card/Margin/ControlsPanel/RowMap/PadButton" unique_id=1351665555]
+layout_mode = 0
+text = "?"
+
+[node name="RowMenu" type="HBoxContainer" parent="Center/Card/Margin/ControlsPanel" unique_id=1010623444]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RowName" type="Label" parent="Center/Card/Margin/ControlsPanel/RowMenu" unique_id=1134620395]
+layout_mode = 2
+text = "Menu"
+
+[node name="KeyButton" type="Button" parent="Center/Card/Margin/ControlsPanel/RowMenu" unique_id=930986732]
+layout_mode = 2
+
+[node name="PadButton" type="Button" parent="Center/Card/Margin/ControlsPanel/RowMenu" unique_id=1749785404]
+layout_mode = 2
+
+[node name="PadGlyph" type="TextureRect" parent="Center/Card/Margin/ControlsPanel/RowMenu/PadButton" unique_id=1926729738]
+layout_mode = 0
+
+[node name="PadEmpty" type="Label" parent="Center/Card/Margin/ControlsPanel/RowMenu/PadButton" unique_id=1871707442]
+layout_mode = 0
+text = "?"
+
+[node name="ControlsStatus" type="Label" parent="Center/Card/Margin/ControlsPanel" unique_id=258549542]
+layout_mode = 2
+
+[node name="ResetButton" type="Button" parent="Center/Card/Margin/ControlsPanel" unique_id=78117957]
+layout_mode = 2
+text = "Reset defaults"
+
+[node name="ControlsBackButton" type="Button" parent="Center/Card/Margin/ControlsPanel" unique_id=1322834179]
 layout_mode = 2
 text = "Back"
 

@@ -1,10 +1,10 @@
 extends Control
-## MainMenu: shell scene for the base project (Step 1).
+## MainMenu: shell scene for the base project.
 ##
-## Single scene, panel switching: Main / Slots / Settings hub / stubs
-## (Controls, Video, Audio arrive in later steps). Back-stack navigation,
-## first-button focus for gamepad/keyboard, Esc = back (exit-confirm on Main),
-## Exit hidden on web/mobile.
+## Single scene, panel switching: Main / Slots / Settings hub / Controls /
+## Video / Audio. Back-stack navigation, first-button focus for
+## gamepad/keyboard, Esc = back (exit-confirm on Main), Exit hidden on
+## web/mobile. Fire = confirm, Jump = cancel in menus.
 
 const PANEL_MAIN: StringName = &"MainPanel"
 const PANEL_SLOTS: StringName = &"SlotsPanel"
@@ -17,6 +17,40 @@ const LOCALE_CODES: Array[String] = ["en", "fr", "it", "de", "es", "pt_BR"]
 const LOCALE_NAMES: Array[String] = ["English", "Français", "Italiano", "Deutsch", "Español", "Português (BR)"]
 
 const TEST_CLICK: AudioStream = preload("res://assets/sounds/sfx/kenney_interface-sounds/Audio/click_001.ogg")
+
+## Controls remap: scene row per action + i18n key per action display name.
+const ROW_NODE: Dictionary = {
+	&"move_up": "RowMoveUp",
+	&"move_down": "RowMoveDown",
+	&"move_left": "RowMoveLeft",
+	&"move_right": "RowMoveRight",
+	&"jump": "RowJump",
+	&"fire": "RowFire",
+	&"dash": "RowDash",
+	&"map": "RowMap",
+	&"menu": "RowMenu",
+}
+const ACTION_I18N: Dictionary = {
+	&"move_up": "ACTION_UP",
+	&"move_down": "ACTION_DOWN",
+	&"move_left": "ACTION_LEFT",
+	&"move_right": "ACTION_RIGHT",
+	&"jump": "ACTION_JUMP",
+	&"fire": "ACTION_FIRE",
+	&"dash": "ACTION_DASH",
+	&"map": "ACTION_MAP",
+	&"menu": "ACTION_MENU",
+}
+const LISTEN_ARM_MSEC: int = 200
+
+var _listening_action: StringName = &""
+var _listen_start_msec: int = 0
+var _row_box: Dictionary = {}
+var _row_name: Dictionary = {}
+var _row_key: Dictionary = {}
+var _row_pad: Dictionary = {}
+var _row_glyph: Dictionary = {}
+var _row_empty: Dictionary = {}
 
 var _history: Array[StringName] = []
 var _current: StringName = PANEL_MAIN
@@ -33,7 +67,7 @@ var _current: StringName = PANEL_MAIN
 	PANEL_MAIN: $Center/Card/Margin/MainPanel/PlayButton,
 	PANEL_SLOTS: $Center/Card/Margin/SlotsPanel/Slot1Button,
 	PANEL_SETTINGS: $Center/Card/Margin/SettingsPanel/ControlsButton,
-	PANEL_CONTROLS: $Center/Card/Margin/ControlsPanel/ControlsBackButton,
+	PANEL_CONTROLS: $Center/Card/Margin/ControlsPanel/RowMoveUp/KeyButton,
 	PANEL_VIDEO: $Center/Card/Margin/VideoPanel/ModeRow/ModeOption,
 	PANEL_AUDIO: $Center/Card/Margin/AudioPanel/SoundRow/SoundSlider,
 }
@@ -60,7 +94,11 @@ var _current: StringName = PANEL_MAIN
 @onready var _settings_back_button: Button = $Center/Card/Margin/SettingsPanel/SettingsBackButton
 
 @onready var _controls_title: Label = $Center/Card/Margin/ControlsPanel/ControlsTitle
-@onready var _controls_wip: Label = $Center/Card/Margin/ControlsPanel/ControlsWip
+@onready var _ctrls_h_action: Label = $Center/Card/Margin/ControlsPanel/HeaderRow/HAction
+@onready var _ctrls_h_key: Label = $Center/Card/Margin/ControlsPanel/HeaderRow/HKey
+@onready var _ctrls_h_pad: Label = $Center/Card/Margin/ControlsPanel/HeaderRow/HPad
+@onready var _controls_status: Label = $Center/Card/Margin/ControlsPanel/ControlsStatus
+@onready var _reset_button: Button = $Center/Card/Margin/ControlsPanel/ResetButton
 @onready var _controls_back_button: Button = $Center/Card/Margin/ControlsPanel/ControlsBackButton
 @onready var _video_title: Label = $Center/Card/Margin/VideoPanel/VideoTitle
 @onready var _mode_row: HBoxContainer = $Center/Card/Margin/VideoPanel/ModeRow
@@ -89,21 +127,34 @@ func _ready() -> void:
 	_apply_theme_tokens()
 	_connect_signals()
 	_fill_languages()
+	_collect_control_rows()
+	_size_control_rows()
 	_exit_button.visible = Gm.is_exit_allowed()
 	_retranslate()
 	show_panel(PANEL_MAIN, false)
+
+
+func _input(event: InputEvent) -> void:
+	if Gm.is_input_paused:
+		return
+	if _listening_action != &"":
+		_capture_remap(event)
+		return
+	# Fire = confirm, Jump = cancel. Handled here (before the GUI) so the
+	# Jump pad button can't double-trigger via builtin ui_accept.
+	if event.is_action_pressed("jump"):
+		_on_cancel_pressed()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("fire"):
+		_activate_focused()
+		get_viewport().set_input_as_handled()
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if Gm.is_input_paused:
 		return
 	if event.is_action_pressed("menu"):
-		if _exit_dialog.visible:
-			_exit_dialog.hide()
-		elif _current != PANEL_MAIN:
-			go_back()
-		else:
-			_on_exit_pressed()
+		_on_cancel_pressed()
 		get_viewport().set_input_as_handled()
 
 
@@ -112,6 +163,8 @@ func _unhandled_input(event: InputEvent) -> void:
 func show_panel(panel: StringName, push: bool = true) -> void:
 	if _current == PANEL_AUDIO and panel != PANEL_AUDIO:
 		Gm.save_settings()
+	if _current == PANEL_CONTROLS and panel != PANEL_CONTROLS:
+		_stop_listening()
 	if push and _current != &"" and _current != panel:
 		_history.push_back(_current)
 	_current = panel
@@ -123,6 +176,8 @@ func show_panel(panel: StringName, push: bool = true) -> void:
 		_refresh_audio()
 	if panel == PANEL_VIDEO:
 		_refresh_video()
+	if panel == PANEL_CONTROLS:
+		_refresh_controls()
 	var first: Control = _first_focus.get(panel)
 	if first != null:
 		first.grab_focus()
@@ -261,6 +316,125 @@ func _on_resolution_selected(index: int) -> void:
 #endregion
 
 
+#region CONTROLS
+
+func _collect_control_rows() -> void:
+	var base: String = "Center/Card/Margin/ControlsPanel"
+	for action: StringName in Gm.GAME_ACTIONS:
+		var row: HBoxContainer = get_node(base + "/" + str(ROW_NODE[action])) as HBoxContainer
+		_row_box[action] = row
+		_row_name[action] = row.get_node("RowName") as Label
+		_row_key[action] = row.get_node("KeyButton") as Button
+		_row_pad[action] = row.get_node("PadButton") as Button
+		_row_glyph[action] = row.get_node("PadButton/PadGlyph") as TextureRect
+		_row_empty[action] = row.get_node("PadButton/PadEmpty") as Label
+		(_row_key[action] as Button).pressed.connect(_start_listening.bind(action))
+		(_row_pad[action] as Button).pressed.connect(_start_listening.bind(action))
+
+func _size_control_rows() -> void:
+	for action: StringName in Gm.GAME_ACTIONS:
+		(_row_name[action] as Label).size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		(_row_key[action] as Button).custom_minimum_size = Vector2(110, 44)
+		(_row_pad[action] as Button).custom_minimum_size = Vector2(72, 44)
+		var glyph: TextureRect = _row_glyph[action] as TextureRect
+		glyph.custom_minimum_size = Vector2(40, 40)
+		glyph.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		glyph.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		glyph.set_anchors_preset(Control.PRESET_FULL_RECT)
+		var empty: Label = _row_empty[action] as Label
+		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		empty.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		empty.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		empty.set_anchors_preset(Control.PRESET_FULL_RECT)
+
+func _refresh_controls() -> void:
+	for action: StringName in Gm.GAME_ACTIONS:
+		(_row_name[action] as Label).text = tr(str(ACTION_I18N.get(action, "ACTION_MENU")))
+		(_row_key[action] as Button).text = Gm.key_event_label(Gm.get_action_key(action))
+		var glyph: TextureRect = _row_glyph[action] as TextureRect
+		var empty: Label = _row_empty[action] as Label
+		var bev: InputEventJoypadButton = Gm.get_action_button(action)
+		var tex: Texture2D = null
+		if bev != null:
+			var path: String = Gm.joy_glyph_path(int(bev.button_index))
+			if not path.is_empty() and ResourceLoader.exists(path):
+				tex = load(path) as Texture2D
+		if tex != null:
+			glyph.texture = tex
+			glyph.visible = true
+			empty.visible = false
+		else:
+			glyph.visible = false
+			empty.visible = true
+
+func _start_listening(action: StringName) -> void:
+	_listening_action = action
+	_listen_start_msec = Time.get_ticks_msec()
+	_controls_status.text = tr("CTRLS_LISTENING")
+	_refresh_row_highlight()
+
+func _stop_listening() -> void:
+	_listening_action = &""
+	if is_node_ready():
+		_controls_status.text = ""
+		_refresh_row_highlight()
+
+func _refresh_row_highlight() -> void:
+	for action: StringName in Gm.GAME_ACTIONS:
+		var box: HBoxContainer = _row_box.get(action) as HBoxContainer
+		if box != null:
+			box.modulate = Color(1.0, 0.95, 0.6) if action == _listening_action else Color.WHITE
+
+func _capture_remap(event: InputEvent) -> void:
+	if event is InputEventKey and (event as InputEventKey).echo:
+		return
+	if event.is_action_pressed("menu"):
+		_stop_listening()
+		get_viewport().set_input_as_handled()
+		return
+	if Time.get_ticks_msec() - _listen_start_msec < LISTEN_ARM_MSEC:
+		get_viewport().set_input_as_handled()
+		return
+	if event is InputEventKey and (event as InputEventKey).pressed:
+		var kev: InputEventKey = ((event as InputEventKey).duplicate() as InputEventKey)
+		Gm.clear_matching_key(kev, _listening_action)
+		Gm.set_action_key(_listening_action, kev)
+		Gm.save_settings()
+		_stop_listening()
+		_refresh_controls()
+		get_viewport().set_input_as_handled()
+	elif event is InputEventJoypadButton and (event as InputEventJoypadButton).pressed:
+		var bev: InputEventJoypadButton = ((event as InputEventJoypadButton).duplicate() as InputEventJoypadButton)
+		Gm.clear_matching_button(bev, _listening_action)
+		Gm.set_action_button(_listening_action, bev)
+		Gm.save_settings()
+		_stop_listening()
+		_refresh_controls()
+		get_viewport().set_input_as_handled()
+
+func _on_reset_controls() -> void:
+	_stop_listening()
+	Gm.reset_controls_to_defaults()
+	Gm.save_settings()
+	_refresh_controls()
+
+func _activate_focused() -> void:
+	var focus: Control = get_viewport().gui_get_focus_owner()
+	if focus is Button and focus.visible and not (focus as Button).disabled:
+		(focus as Button).pressed.emit()
+
+func _on_cancel_pressed() -> void:
+	if _exit_dialog.visible:
+		_exit_dialog.hide()
+	elif _current != PANEL_MAIN:
+		go_back()
+	else:
+		_on_exit_pressed()
+
+#endregion
+
+
 #region EXIT
 
 func _on_exit_pressed() -> void:
@@ -296,6 +470,15 @@ func _retranslate() -> void:
 	_language_label.text = tr("SETTINGS_LANGUAGE")
 	_settings_back_button.text = tr("MENU_BACK")
 	_controls_title.text = tr("CONTROLS_TITLE")
+	_ctrls_h_action.text = tr("CTRLS_ACTION")
+	_ctrls_h_key.text = tr("CTRLS_KEY")
+	_ctrls_h_pad.text = tr("CTRLS_PAD")
+	_reset_button.text = tr("CTRLS_RESET")
+	if _listening_action != &"":
+		_controls_status.text = tr("CTRLS_LISTENING")
+	else:
+		_controls_status.text = ""
+	_refresh_controls()
 	_video_title.text = tr("VIDEO_TITLE")
 	_mode_label.text = tr("VIDEO_MODE")
 	_res_label.text = tr("VIDEO_RESOLUTION")
@@ -307,8 +490,6 @@ func _retranslate() -> void:
 	_music_label.text = tr("AUDIO_MUSIC")
 	_test_sound_button.text = tr("AUDIO_TEST")
 	_update_audio_labels()
-	for wip: Label in [_controls_wip]:
-		wip.text = tr("WIP")
 	_controls_back_button.text = tr("MENU_BACK")
 	_video_back_button.text = tr("MENU_BACK")
 	_audio_back_button.text = tr("MENU_BACK")
@@ -345,4 +526,5 @@ func _connect_signals() -> void:
 	_test_sound_button.pressed.connect(_on_test_sound)
 	_mode_option.item_selected.connect(_on_mode_selected)
 	_res_option.item_selected.connect(_on_resolution_selected)
+	_reset_button.pressed.connect(_on_reset_controls)
 	_exit_dialog.confirmed.connect(_on_exit_confirmed)

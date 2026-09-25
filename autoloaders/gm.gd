@@ -12,7 +12,7 @@ extends Node
 #region CONSTANTS
 
 const SETTINGS_PATH: String = "user://settings.cfg"
-const SETTINGS_VERSION: String = "1.0"
+const SETTINGS_VERSION: String = "1.1"
 const SLOT_VERSION: String = "1.0"
 const SLOT_COUNT: int = 3
 
@@ -59,6 +59,53 @@ const ACTION_LABELS: Dictionary = {
 	&"dash": "Dash",
 	&"map": "Map",
 	&"menu": "Menu",
+}
+
+## Single default bindings (Controls screen: one key + one pad button each).
+## Pad indices use the Wii Remote vocabulary (no Nunchuk); see JOY_GLYPH_NAMES.
+const KEY_DEFAULTS: Dictionary = {
+	&"move_up": "Up",
+	&"move_down": "Down",
+	&"move_left": "Left",
+	&"move_right": "Right",
+	&"jump": "Z",
+	&"fire": "X",
+	&"dash": "Shift",
+	&"map": "Tab",
+	&"menu": "Escape",
+}
+const PAD_DEFAULTS: Dictionary = {
+	&"move_up": JOY_BUTTON_DPAD_UP,
+	&"move_down": JOY_BUTTON_DPAD_DOWN,
+	&"move_left": JOY_BUTTON_DPAD_LEFT,
+	&"move_right": JOY_BUTTON_DPAD_RIGHT,
+	&"jump": JOY_BUTTON_A,
+	&"fire": JOY_BUTTON_B,
+	&"dash": JOY_BUTTON_X,
+	&"map": JOY_BUTTON_BACK,
+	&"menu": JOY_BUTTON_START,
+}
+
+## Wii Remote glyphs (Vector SVGs) per Godot JoyButton index. Unlisted → "?" fallback.
+const WII_SVG_DIR: String = "res://assets/images/ui/kenney_input-prompts_1.5/Nintendo Wii/Vector"
+const JOY_GLYPH_NAMES: Dictionary = {
+	0: "wii_button_2",
+	1: "wii_button_1",
+	2: "wii_button_b",
+	4: "wii_button_minus",
+	6: "wii_button_home",
+	11: "wii_dpad_up",
+	12: "wii_dpad_down",
+	13: "wii_dpad_left",
+	14: "wii_dpad_right",
+}
+
+## Left-stick directions auto-attached (invisibly) to move actions.
+const STICK_AXES: Dictionary = {
+	&"move_up": [JOY_AXIS_LEFT_Y, -1.0],
+	&"move_down": [JOY_AXIS_LEFT_Y, 1.0],
+	&"move_left": [JOY_AXIS_LEFT_X, -1.0],
+	&"move_right": [JOY_AXIS_LEFT_X, 1.0],
 }
 
 #endregion
@@ -127,7 +174,8 @@ func load_settings() -> void:
 	var err: int = cfg.load(SETTINGS_PATH)
 	if err != OK:
 		return  # First boot: defaults stand.
-	if cfg.get_value("meta", "version", SETTINGS_VERSION) != SETTINGS_VERSION:
+	var stored_version: String = str(cfg.get_value("meta", "version", SETTINGS_VERSION))
+	if stored_version != SETTINGS_VERSION:
 		push_warning("Settings version mismatch, some keys may use defaults.")
 	sfx_db = float(cfg.get_value("audio", "sfx_db", DEFAULT_SFX_DB))
 	music_db = float(cfg.get_value("audio", "music_db", DEFAULT_MUSIC_DB))
@@ -135,7 +183,10 @@ func load_settings() -> void:
 	video_style = int(cfg.get_value("video", "mode", DEFAULT_VIDEO_STYLE))
 	video_res_w = int(cfg.get_value("video", "resolution_w", DEFAULT_RES_W))
 	video_res_h = int(cfg.get_value("video", "resolution_h", DEFAULT_RES_H))
-	_load_controls_from_cfg(cfg)
+	if stored_version == SETTINGS_VERSION:
+		_load_controls_from_cfg(cfg)
+	# Else: pre-1.1 controls blobs are incompatible with the single-column
+	# model, so fresh defaults (already applied above) stand.
 
 func save_settings() -> bool:
 	var cfg: ConfigFile = ConfigFile.new()
@@ -337,16 +388,11 @@ func _prune_sfx_pool() -> void:
 
 ## Idempotent: also repairs duplicates of this base whose project.godot
 ## InputMap section was lost. Called from initialize().
+## Model: exactly one keyboard event + one pad-button event per action
+## (plus invisible stick axes on move actions, see _attach_stick_if_move).
 func ensure_default_actions() -> void:
-	_ensure_action(&"move_up", ["W", "Up"], {"axis": Vector2.UP})
-	_ensure_action(&"move_down", ["S", "Down"], {"axis": Vector2.DOWN})
-	_ensure_action(&"move_left", ["A", "Left"], {"axis": Vector2.LEFT})
-	_ensure_action(&"move_right", ["D", "Right"], {"axis": Vector2.RIGHT})
-	_ensure_action(&"jump", ["Space"], {"buttons": [JOY_BUTTON_A]})
-	_ensure_action(&"fire", ["J", "X"], {"buttons": [JOY_BUTTON_X]})
-	_ensure_action(&"dash", ["K", "Shift"], {"buttons": [JOY_BUTTON_B]})
-	_ensure_action(&"map", ["M", "Tab"], {"buttons": [JOY_BUTTON_Y, JOY_BUTTON_BACK]})
-	_ensure_action(&"menu", ["Escape", "P"], {"buttons": [JOY_BUTTON_START]})
+	for action: StringName in GAME_ACTIONS:
+		_ensure_single_binding(action)
 
 func reset_controls_to_defaults() -> void:
 	for action: StringName in GAME_ACTIONS:
@@ -354,21 +400,23 @@ func reset_controls_to_defaults() -> void:
 			InputMap.action_erase_events(action)
 	ensure_default_actions()
 
-func _ensure_action(action: StringName, keys: Array, pad: Dictionary) -> void:
+func _ensure_single_binding(action: StringName) -> void:
 	if not InputMap.has_action(action):
 		InputMap.add_action(action)
 	if InputMap.action_get_events(action).is_empty():
-		for key_name: String in keys:
-			var ev: InputEventKey = InputEventKey.new()
-			ev.physical_keycode = OS.find_keycode_from_string(key_name)
-			InputMap.action_add_event(action, ev)
-		if pad.has("axis") and pad["axis"] is Vector2:
-			var dir: Vector2 = pad["axis"]
-			_add_pad_motion(action, JOY_AXIS_LEFT_X if dir.x != 0.0 else JOY_AXIS_LEFT_Y, signf(dir.x + dir.y))
-		for btn: int in pad.get("buttons", []):
-			var bev: InputEventJoypadButton = InputEventJoypadButton.new()
-			bev.button_index = btn as JoyButton
-			InputMap.action_add_event(action, bev)
+		var key_ev: InputEventKey = InputEventKey.new()
+		key_ev.physical_keycode = OS.find_keycode_from_string(str(KEY_DEFAULTS.get(action, "Escape")))
+		InputMap.action_add_event(action, key_ev)
+		var bev: InputEventJoypadButton = InputEventJoypadButton.new()
+		bev.button_index = int(PAD_DEFAULTS.get(action, 0)) as JoyButton
+		InputMap.action_add_event(action, bev)
+		_attach_stick_if_move(action)
+
+func _attach_stick_if_move(action: StringName) -> void:
+	if not STICK_AXES.has(action):
+		return
+	var spec: Array = STICK_AXES[action]
+	_add_pad_motion(action, spec[0], spec[1])
 
 func _add_pad_motion(action: StringName, axis: JoyAxis, value: float) -> void:
 	var ev: InputEventJoypadMotion = InputEventJoypadMotion.new()
@@ -382,12 +430,14 @@ func _save_controls_to_cfg(cfg: ConfigFile) -> void:
 	for action: StringName in GAME_ACTIONS:
 		if not InputMap.has_action(action):
 			continue
-		var serial: Array = []
+		var key_d: Dictionary = {}
+		var btn_d: Dictionary = {}
 		for ev: InputEvent in InputMap.action_get_events(action):
-			var d: Dictionary = _event_to_dict(ev)
-			if not d.is_empty():
-				serial.append(d)
-		cfg.set_value("controls", String(action), serial)
+			if ev is InputEventKey and key_d.is_empty():
+				key_d = _event_to_dict(ev)
+			elif ev is InputEventJoypadButton and btn_d.is_empty():
+				btn_d = _event_to_dict(ev)
+		cfg.set_value("controls", String(action), {"key": key_d, "button": btn_d})
 
 func _load_controls_from_cfg(cfg: ConfigFile) -> void:
 	if not cfg.has_section("controls"):
@@ -395,16 +445,93 @@ func _load_controls_from_cfg(cfg: ConfigFile) -> void:
 	for action: StringName in GAME_ACTIONS:
 		if not cfg.has_section_key("controls", String(action)):
 			continue
-		var serial: Array = cfg.get_value("controls", String(action), []) as Array
-		if serial.is_empty():
-			continue
+		var slot: Variant = cfg.get_value("controls", String(action), {})
+		if typeof(slot) != TYPE_DICTIONARY:
+			continue  # Pre-1.1 blob: ignore, fresh defaults stand.
 		if not InputMap.has_action(action):
 			InputMap.add_action(action)
 		InputMap.action_erase_events(action)
-		for d: Variant in serial:
-			var ev: InputEvent = _dict_to_event(d as Dictionary)
-			if ev != null:
-				InputMap.action_add_event(action, ev)
+		var kev: InputEvent = _dict_to_event((slot as Dictionary).get("key", {}) as Dictionary)
+		if kev != null:
+			InputMap.action_add_event(action, kev)
+		var bev: InputEvent = _dict_to_event((slot as Dictionary).get("button", {}) as Dictionary)
+		if bev != null:
+			InputMap.action_add_event(action, bev)
+		_attach_stick_if_move(action)
+
+#region remap accessors (Controls screen builds on these)
+
+func get_action_key(action: StringName) -> InputEventKey:
+	if not InputMap.has_action(action):
+		return null
+	for ev: InputEvent in InputMap.action_get_events(action):
+		if ev is InputEventKey:
+			return ev as InputEventKey
+	return null
+
+func get_action_button(action: StringName) -> InputEventJoypadButton:
+	if not InputMap.has_action(action):
+		return null
+	for ev: InputEvent in InputMap.action_get_events(action):
+		if ev is InputEventJoypadButton:
+			return ev as InputEventJoypadButton
+	return null
+
+func set_action_key(action: StringName, ev: InputEventKey) -> void:
+	if not InputMap.has_action(action):
+		InputMap.add_action(action)
+	for old: InputEvent in InputMap.action_get_events(action):
+		if old is InputEventKey:
+			InputMap.action_erase_event(action, old)
+	if ev != null:
+		InputMap.action_add_event(action, ev)
+
+func set_action_button(action: StringName, ev: InputEventJoypadButton) -> void:
+	if not InputMap.has_action(action):
+		InputMap.add_action(action)
+	for old: InputEvent in InputMap.action_get_events(action):
+		if old is InputEventJoypadButton:
+			InputMap.action_erase_event(action, old)
+	if ev != null:
+		InputMap.action_add_event(action, ev)
+
+## Steal rule: clear the same-column binding on every OTHER action.
+func clear_matching_key(ev: InputEventKey, except: StringName) -> void:
+	for action: StringName in GAME_ACTIONS:
+		if action == except:
+			continue
+		var cur: InputEventKey = get_action_key(action)
+		if cur != null and _same_key(cur, ev):
+			set_action_key(action, null)
+
+func clear_matching_button(ev: InputEventJoypadButton, except: StringName) -> void:
+	for action: StringName in GAME_ACTIONS:
+		if action == except:
+			continue
+		var cur: InputEventJoypadButton = get_action_button(action)
+		if cur != null and cur.button_index == ev.button_index:
+			set_action_button(action, null)
+
+func _same_key(a: InputEventKey, b: InputEventKey) -> bool:
+	var ac: int = int(a.physical_keycode if a.physical_keycode != 0 else a.keycode)
+	var bc: int = int(b.physical_keycode if b.physical_keycode != 0 else b.keycode)
+	return ac != 0 and ac == bc
+
+func key_event_label(ev: InputEventKey) -> String:
+	if ev == null:
+		return "—"
+	var code: int = int(ev.physical_keycode if ev.physical_keycode != 0 else ev.keycode)
+	if code == 0:
+		return "—"
+	return OS.get_keycode_string(code as Key)
+
+func joy_glyph_path(button_index: int) -> String:
+	var stem: String = str(JOY_GLYPH_NAMES.get(button_index, ""))
+	if stem.is_empty():
+		return ""
+	return "%s/%s.svg" % [WII_SVG_DIR, stem]
+
+#endregion
 
 func _event_to_dict(ev: InputEvent) -> Dictionary:
 	if ev is InputEventKey:
