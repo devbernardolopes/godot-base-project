@@ -57,7 +57,7 @@ What follows is the folder structure of this project relative to its root. Sub-f
 
 All user-facing strings will be localized for the following languages: English, French, Italian, German, Spanish, and Brazilian Portuguese. The default and reference language is English. Don't translate anything from English to any other language. Just keep key parity with the English language to other languages.
 
-Workflow: `resources/i18n/translations.csv` is the source with header `keys,en,fr,it,de,es,pt_BR`. Non-English cells stay empty until a human translates them (the CSV importer only emits `.translation` files for columns with content). After editing the CSV, reimport it and ensure `internationalization/locale/translations` lists the generated files. Fallback locale is `en`, so missing entries fall back to English. Key naming: `MENU_*`, `SETTINGS_*`, `SLOT_*`, `VIDEO_*`, `AUDIO_*`, `CONTROLS_*`.
+Workflow: `resources/i18n/translations.csv` is the source with header `keys,en,fr,it,de,es,pt_BR`. Non-English cells stay empty until a human translates them (the CSV importer only emits `.translation` files for columns with content). After editing the CSV, run a filesystem scan (reimport if the outputs look stale) and verify the generated files' mtimes actually refreshed before wiring them. Ensure `internationalization/locale/translations` lists the generated files. Fallback locale is `en`, so missing entries fall back to English. Key naming: `MENU_*`, `SETTINGS_*`, `SLOT_*`, `VIDEO_*`, `AUDIO_*`, `CONTROLS_*`.
 
 ## Testing
 

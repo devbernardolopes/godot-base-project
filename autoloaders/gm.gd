@@ -201,12 +201,12 @@ func _set_bus_volume(bus: StringName, db: float) -> void:
 
 #region SAVE SLOTS (per-slot gameplay data)
 
-static func slot_path(slot: int) -> String:
+func slot_path(slot: int) -> String:
 	return "user://save_slot_%d.json" % slot
 
 ## Minimal slot payload. Games extend `data` freely; the four top-level keys
 ## are reserved by the base (used by the slot-select screen).
-static func new_slot_data() -> Dictionary:
+func new_slot_data() -> Dictionary:
 	return {
 		"version": SLOT_VERSION,
 		"created_at": Time.get_datetime_string_from_system(true, false),
