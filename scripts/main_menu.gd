@@ -56,70 +56,72 @@ var _history: Array[StringName] = []
 var _current: StringName = PANEL_MAIN
 
 @onready var _panels: Dictionary = {
-	PANEL_MAIN: $Center/Card/Margin/MainPanel,
-	PANEL_SLOTS: $Center/Card/Margin/SlotsPanel,
-	PANEL_SETTINGS: $Center/Card/Margin/SettingsPanel,
-	PANEL_CONTROLS: $Center/Card/Margin/ControlsPanel,
-	PANEL_VIDEO: $Center/Card/Margin/VideoPanel,
-	PANEL_AUDIO: $Center/Card/Margin/AudioPanel,
+	PANEL_MAIN: $Scroll/HCenter/Card/Margin/MainPanel,
+	PANEL_SLOTS: $Scroll/HCenter/Card/Margin/SlotsPanel,
+	PANEL_SETTINGS: $Scroll/HCenter/Card/Margin/SettingsPanel,
+	PANEL_CONTROLS: $Scroll/HCenter/Card/Margin/ControlsPanel,
+	PANEL_VIDEO: $Scroll/HCenter/Card/Margin/VideoPanel,
+	PANEL_AUDIO: $Scroll/HCenter/Card/Margin/AudioPanel,
 }
 @onready var _first_focus: Dictionary = {
-	PANEL_MAIN: $Center/Card/Margin/MainPanel/PlayButton,
-	PANEL_SLOTS: $Center/Card/Margin/SlotsPanel/Slot1Button,
-	PANEL_SETTINGS: $Center/Card/Margin/SettingsPanel/ControlsButton,
-	PANEL_CONTROLS: $Center/Card/Margin/ControlsPanel/RowMoveUp/KeyButton,
-	PANEL_VIDEO: $Center/Card/Margin/VideoPanel/ModeRow/ModeOption,
-	PANEL_AUDIO: $Center/Card/Margin/AudioPanel/SoundRow/SoundSlider,
+	PANEL_MAIN: $Scroll/HCenter/Card/Margin/MainPanel/PlayButton,
+	PANEL_SLOTS: $Scroll/HCenter/Card/Margin/SlotsPanel/Slot1Button,
+	PANEL_SETTINGS: $Scroll/HCenter/Card/Margin/SettingsPanel/ControlsButton,
+	PANEL_CONTROLS: $Scroll/HCenter/Card/Margin/ControlsPanel/RowMoveUp/KeyButton,
+	PANEL_VIDEO: $Scroll/HCenter/Card/Margin/VideoPanel/ModeRow/ModeOption,
+	PANEL_AUDIO: $Scroll/HCenter/Card/Margin/AudioPanel/SoundRow/SoundSlider,
 }
 
-@onready var _main_title: Label = $Center/Card/Margin/MainPanel/MainTitle
-@onready var _play_button: Button = $Center/Card/Margin/MainPanel/PlayButton
-@onready var _settings_button: Button = $Center/Card/Margin/MainPanel/SettingsButton
-@onready var _exit_button: Button = $Center/Card/Margin/MainPanel/ExitButton
+@onready var _main_title: Label = $Scroll/HCenter/Card/Margin/MainPanel/MainTitle
+@onready var _play_button: Button = $Scroll/HCenter/Card/Margin/MainPanel/PlayButton
+@onready var _settings_button: Button = $Scroll/HCenter/Card/Margin/MainPanel/SettingsButton
+@onready var _exit_button: Button = $Scroll/HCenter/Card/Margin/MainPanel/ExitButton
 
-@onready var _slots_title: Label = $Center/Card/Margin/SlotsPanel/SlotsTitle
+@onready var _slots_title: Label = $Scroll/HCenter/Card/Margin/SlotsPanel/SlotsTitle
 @onready var _slot_buttons: Array[Button] = [
-	$Center/Card/Margin/SlotsPanel/Slot1Button,
-	$Center/Card/Margin/SlotsPanel/Slot2Button,
-	$Center/Card/Margin/SlotsPanel/Slot3Button,
+	$Scroll/HCenter/Card/Margin/SlotsPanel/Slot1Button,
+	$Scroll/HCenter/Card/Margin/SlotsPanel/Slot2Button,
+	$Scroll/HCenter/Card/Margin/SlotsPanel/Slot3Button,
 ]
-@onready var _slots_back_button: Button = $Center/Card/Margin/SlotsPanel/SlotsBackButton
+@onready var _slots_back_button: Button = $Scroll/HCenter/Card/Margin/SlotsPanel/SlotsBackButton
 
-@onready var _settings_title: Label = $Center/Card/Margin/SettingsPanel/SettingsTitle
-@onready var _controls_button: Button = $Center/Card/Margin/SettingsPanel/ControlsButton
-@onready var _video_button: Button = $Center/Card/Margin/SettingsPanel/VideoButton
-@onready var _audio_button: Button = $Center/Card/Margin/SettingsPanel/AudioButton
-@onready var _language_label: Label = $Center/Card/Margin/SettingsPanel/LanguageRow/LanguageLabel
-@onready var _language_option: OptionButton = $Center/Card/Margin/SettingsPanel/LanguageRow/LanguageOption
-@onready var _settings_back_button: Button = $Center/Card/Margin/SettingsPanel/SettingsBackButton
+@onready var _settings_title: Label = $Scroll/HCenter/Card/Margin/SettingsPanel/SettingsTitle
+@onready var _controls_button: Button = $Scroll/HCenter/Card/Margin/SettingsPanel/ControlsButton
+@onready var _video_button: Button = $Scroll/HCenter/Card/Margin/SettingsPanel/VideoButton
+@onready var _audio_button: Button = $Scroll/HCenter/Card/Margin/SettingsPanel/AudioButton
+@onready var _language_label: Label = $Scroll/HCenter/Card/Margin/SettingsPanel/LanguageRow/LanguageLabel
+@onready var _language_option: OptionButton = $Scroll/HCenter/Card/Margin/SettingsPanel/LanguageRow/LanguageOption
+@onready var _settings_back_button: Button = $Scroll/HCenter/Card/Margin/SettingsPanel/SettingsBackButton
 
-@onready var _controls_title: Label = $Center/Card/Margin/ControlsPanel/ControlsTitle
-@onready var _ctrls_h_action: Label = $Center/Card/Margin/ControlsPanel/HeaderRow/HAction
-@onready var _ctrls_h_key: Label = $Center/Card/Margin/ControlsPanel/HeaderRow/HKey
-@onready var _ctrls_h_pad: Label = $Center/Card/Margin/ControlsPanel/HeaderRow/HPad
-@onready var _controls_status: Label = $Center/Card/Margin/ControlsPanel/ControlsStatus
-@onready var _reset_button: Button = $Center/Card/Margin/ControlsPanel/ResetButton
-@onready var _controls_back_button: Button = $Center/Card/Margin/ControlsPanel/ControlsBackButton
-@onready var _video_title: Label = $Center/Card/Margin/VideoPanel/VideoTitle
-@onready var _mode_row: HBoxContainer = $Center/Card/Margin/VideoPanel/ModeRow
-@onready var _mode_label: Label = $Center/Card/Margin/VideoPanel/ModeRow/ModeLabel
-@onready var _mode_option: OptionButton = $Center/Card/Margin/VideoPanel/ModeRow/ModeOption
-@onready var _res_row: HBoxContainer = $Center/Card/Margin/VideoPanel/ResRow
-@onready var _res_label: Label = $Center/Card/Margin/VideoPanel/ResRow/ResLabel
-@onready var _res_option: OptionButton = $Center/Card/Margin/VideoPanel/ResRow/ResOption
-@onready var _video_auto: Label = $Center/Card/Margin/VideoPanel/VideoAuto
-@onready var _video_back_button: Button = $Center/Card/Margin/VideoPanel/VideoBackButton
-@onready var _audio_title: Label = $Center/Card/Margin/AudioPanel/AudioTitle
-@onready var _sound_label: Label = $Center/Card/Margin/AudioPanel/SoundRow/SoundLabel
-@onready var _sound_slider: HSlider = $Center/Card/Margin/AudioPanel/SoundRow/SoundSlider
-@onready var _sound_value: Label = $Center/Card/Margin/AudioPanel/SoundRow/SoundValue
-@onready var _music_label: Label = $Center/Card/Margin/AudioPanel/MusicRow/MusicLabel
-@onready var _music_slider: HSlider = $Center/Card/Margin/AudioPanel/MusicRow/MusicSlider
-@onready var _music_value: Label = $Center/Card/Margin/AudioPanel/MusicRow/MusicValue
-@onready var _test_sound_button: Button = $Center/Card/Margin/AudioPanel/TestSoundButton
-@onready var _audio_back_button: Button = $Center/Card/Margin/AudioPanel/AudioBackButton
+@onready var _controls_title: Label = $Scroll/HCenter/Card/Margin/ControlsPanel/ControlsTitle
+@onready var _ctrls_h_action: Label = $Scroll/HCenter/Card/Margin/ControlsPanel/HeaderRow/HAction
+@onready var _ctrls_h_key: Label = $Scroll/HCenter/Card/Margin/ControlsPanel/HeaderRow/HKey
+@onready var _ctrls_h_pad: Label = $Scroll/HCenter/Card/Margin/ControlsPanel/HeaderRow/HPad
+@onready var _controls_status: Label = $Scroll/HCenter/Card/Margin/ControlsPanel/ControlsStatus
+@onready var _reset_button: Button = $Scroll/HCenter/Card/Margin/ControlsPanel/ResetButton
+@onready var _pad_debug: Label = $Scroll/HCenter/Card/Margin/ControlsPanel/PadDebug
+@onready var _controls_back_button: Button = $Scroll/HCenter/Card/Margin/ControlsPanel/ControlsBackButton
+@onready var _video_title: Label = $Scroll/HCenter/Card/Margin/VideoPanel/VideoTitle
+@onready var _mode_row: HBoxContainer = $Scroll/HCenter/Card/Margin/VideoPanel/ModeRow
+@onready var _mode_label: Label = $Scroll/HCenter/Card/Margin/VideoPanel/ModeRow/ModeLabel
+@onready var _mode_option: OptionButton = $Scroll/HCenter/Card/Margin/VideoPanel/ModeRow/ModeOption
+@onready var _res_row: HBoxContainer = $Scroll/HCenter/Card/Margin/VideoPanel/ResRow
+@onready var _res_label: Label = $Scroll/HCenter/Card/Margin/VideoPanel/ResRow/ResLabel
+@onready var _res_option: OptionButton = $Scroll/HCenter/Card/Margin/VideoPanel/ResRow/ResOption
+@onready var _video_auto: Label = $Scroll/HCenter/Card/Margin/VideoPanel/VideoAuto
+@onready var _video_back_button: Button = $Scroll/HCenter/Card/Margin/VideoPanel/VideoBackButton
+@onready var _audio_title: Label = $Scroll/HCenter/Card/Margin/AudioPanel/AudioTitle
+@onready var _sound_label: Label = $Scroll/HCenter/Card/Margin/AudioPanel/SoundRow/SoundLabel
+@onready var _sound_slider: HSlider = $Scroll/HCenter/Card/Margin/AudioPanel/SoundRow/SoundSlider
+@onready var _sound_value: Label = $Scroll/HCenter/Card/Margin/AudioPanel/SoundRow/SoundValue
+@onready var _music_label: Label = $Scroll/HCenter/Card/Margin/AudioPanel/MusicRow/MusicLabel
+@onready var _music_slider: HSlider = $Scroll/HCenter/Card/Margin/AudioPanel/MusicRow/MusicSlider
+@onready var _music_value: Label = $Scroll/HCenter/Card/Margin/AudioPanel/MusicRow/MusicValue
+@onready var _test_sound_button: Button = $Scroll/HCenter/Card/Margin/AudioPanel/TestSoundButton
+@onready var _audio_back_button: Button = $Scroll/HCenter/Card/Margin/AudioPanel/AudioBackButton
 
 @onready var _exit_dialog: ConfirmationDialog = $ExitDialog
+@onready var _scroll: ScrollContainer = $Scroll
 
 
 func _ready() -> void:
@@ -129,6 +131,10 @@ func _ready() -> void:
 	_fill_languages()
 	_collect_control_rows()
 	_size_control_rows()
+	_pad_debug.visible = OS.is_debug_build()
+	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_scroll.follow_focus = true
+	($Scroll/HCenter as CenterContainer).size_flags_horizontal = Control.SIZE_FILL | Control.SIZE_EXPAND
 	_exit_button.visible = Gm.is_exit_allowed()
 	_retranslate()
 	show_panel(PANEL_MAIN, false)
@@ -137,6 +143,8 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	if Gm.is_input_paused:
 		return
+	if _current == PANEL_CONTROLS and _is_debug_press(event):
+		_pad_debug.text = "IN: " + Gm.describe_input_event(event)
 	if _listening_action != &"":
 		_capture_remap(event)
 		return
@@ -319,7 +327,7 @@ func _on_resolution_selected(index: int) -> void:
 #region CONTROLS
 
 func _collect_control_rows() -> void:
-	var base: String = "Center/Card/Margin/ControlsPanel"
+	var base: String = "Scroll/HCenter/Card/Margin/ControlsPanel"
 	for action: StringName in Gm.GAME_ACTIONS:
 		var row: HBoxContainer = get_node(base + "/" + str(ROW_NODE[action])) as HBoxContainer
 		_row_box[action] = row
@@ -385,6 +393,15 @@ func _refresh_row_highlight() -> void:
 		var box: HBoxContainer = _row_box.get(action) as HBoxContainer
 		if box != null:
 			box.modulate = Color(1.0, 0.95, 0.6) if action == _listening_action else Color.WHITE
+
+func _is_debug_press(event: InputEvent) -> bool:
+	if event is InputEventKey:
+		return (event as InputEventKey).pressed and not (event as InputEventKey).echo
+	if event is InputEventJoypadButton:
+		return (event as InputEventJoypadButton).pressed
+	if event is InputEventJoypadMotion:
+		return absf((event as InputEventJoypadMotion).axis_value) > 0.3
+	return false
 
 func _capture_remap(event: InputEvent) -> void:
 	if event is InputEventKey and (event as InputEventKey).echo:

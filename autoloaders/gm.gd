@@ -80,20 +80,24 @@ const PAD_DEFAULTS: Dictionary = {
 	&"move_left": JOY_BUTTON_DPAD_LEFT,
 	&"move_right": JOY_BUTTON_DPAD_RIGHT,
 	&"jump": JOY_BUTTON_A,
-	&"fire": JOY_BUTTON_B,
-	&"dash": JOY_BUTTON_X,
-	&"map": JOY_BUTTON_BACK,
+	&"fire": JOY_BUTTON_X,
+	&"dash": 9,
+	&"map": JOY_BUTTON_B,
 	&"menu": JOY_BUTTON_START,
 }
 
-## Wii Remote glyphs (Vector SVGs) per Godot JoyButton index. Unlisted → "?" fallback.
+## Wii Remote glyphs (Vector SVGs) per Godot JoyButton index, measured on a
+## direct-Bluetooth hid-wiimote remote (Up=11, Down=12, Right=14, Left=13,
+## 1=2, 2=0, B=9, A=3, -=1, +=10, Home=6). Unlisted → "?" fallback.
 const WII_SVG_DIR: String = "res://assets/images/ui/kenney_input-prompts_1.5/Nintendo Wii/Vector"
 const JOY_GLYPH_NAMES: Dictionary = {
 	0: "wii_button_2",
-	1: "wii_button_1",
-	2: "wii_button_b",
-	4: "wii_button_minus",
+	1: "wii_button_minus",
+	2: "wii_button_1",
+	3: "wii_button_a",
 	6: "wii_button_home",
+	9: "wii_button_b",
+	10: "wii_button_plus",
 	11: "wii_dpad_up",
 	12: "wii_dpad_down",
 	13: "wii_dpad_left",
@@ -530,6 +534,21 @@ func joy_glyph_path(button_index: int) -> String:
 	if stem.is_empty():
 		return ""
 	return "%s/%s.svg" % [WII_SVG_DIR, stem]
+
+## Dev aid: one-line description of the last physical input (pad debugging).
+func describe_input_event(ev: InputEvent) -> String:
+	if ev is InputEventKey:
+		var k: InputEventKey = ev as InputEventKey
+		var code: int = int(k.physical_keycode if k.physical_keycode != 0 else k.keycode)
+		return "key %s (phys %d)" % [OS.get_keycode_string(code as Key), code]
+	if ev is InputEventJoypadButton:
+		return "pad btn %d" % int((ev as InputEventJoypadButton).button_index)
+	if ev is InputEventJoypadMotion:
+		var m: InputEventJoypadMotion = ev as InputEventJoypadMotion
+		return "axis %d = %.2f" % [int(m.axis), float(m.axis_value)]
+	if ev is InputEventMouseButton:
+		return "mouse %d" % int((ev as InputEventMouseButton).button_index)
+	return ev.get_class()
 
 #endregion
 
