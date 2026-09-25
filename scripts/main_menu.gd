@@ -16,6 +16,8 @@ const PANEL_AUDIO: StringName = &"AudioPanel"
 const LOCALE_CODES: Array[String] = ["en", "fr", "it", "de", "es", "pt_BR"]
 const LOCALE_NAMES: Array[String] = ["English", "Français", "Italiano", "Deutsch", "Español", "Português (BR)"]
 
+const TEST_CLICK: AudioStream = preload("res://assets/sounds/sfx/kenney_interface-sounds/Audio/click_001.ogg")
+
 var _history: Array[StringName] = []
 var _current: StringName = PANEL_MAIN
 
@@ -33,7 +35,7 @@ var _current: StringName = PANEL_MAIN
 	PANEL_SETTINGS: $Center/Card/Margin/SettingsPanel/ControlsButton,
 	PANEL_CONTROLS: $Center/Card/Margin/ControlsPanel/ControlsBackButton,
 	PANEL_VIDEO: $Center/Card/Margin/VideoPanel/VideoBackButton,
-	PANEL_AUDIO: $Center/Card/Margin/AudioPanel/AudioBackButton,
+	PANEL_AUDIO: $Center/Card/Margin/AudioPanel/SoundRow/SoundSlider,
 }
 
 @onready var _main_title: Label = $Center/Card/Margin/MainPanel/MainTitle
@@ -64,7 +66,13 @@ var _current: StringName = PANEL_MAIN
 @onready var _video_wip: Label = $Center/Card/Margin/VideoPanel/VideoWip
 @onready var _video_back_button: Button = $Center/Card/Margin/VideoPanel/VideoBackButton
 @onready var _audio_title: Label = $Center/Card/Margin/AudioPanel/AudioTitle
-@onready var _audio_wip: Label = $Center/Card/Margin/AudioPanel/AudioWip
+@onready var _sound_label: Label = $Center/Card/Margin/AudioPanel/SoundRow/SoundLabel
+@onready var _sound_slider: HSlider = $Center/Card/Margin/AudioPanel/SoundRow/SoundSlider
+@onready var _sound_value: Label = $Center/Card/Margin/AudioPanel/SoundRow/SoundValue
+@onready var _music_label: Label = $Center/Card/Margin/AudioPanel/MusicRow/MusicLabel
+@onready var _music_slider: HSlider = $Center/Card/Margin/AudioPanel/MusicRow/MusicSlider
+@onready var _music_value: Label = $Center/Card/Margin/AudioPanel/MusicRow/MusicValue
+@onready var _test_sound_button: Button = $Center/Card/Margin/AudioPanel/TestSoundButton
 @onready var _audio_back_button: Button = $Center/Card/Margin/AudioPanel/AudioBackButton
 
 @onready var _exit_dialog: ConfirmationDialog = $ExitDialog
@@ -96,6 +104,8 @@ func _unhandled_input(event: InputEvent) -> void:
 #region NAVIGATION
 
 func show_panel(panel: StringName, push: bool = true) -> void:
+	if _current == PANEL_AUDIO and panel != PANEL_AUDIO:
+		Gm.save_settings()
 	if push and _current != &"" and _current != panel:
 		_history.push_back(_current)
 	_current = panel
@@ -103,6 +113,8 @@ func show_panel(panel: StringName, push: bool = true) -> void:
 		(_panels[key] as Control).visible = (key == panel)
 	if panel == PANEL_SLOTS:
 		_refresh_slots()
+	if panel == PANEL_AUDIO:
+		_refresh_audio()
 	var first: Control = _first_focus.get(panel)
 	if first != null:
 		first.grab_focus()
@@ -159,6 +171,44 @@ func _on_language_selected(index: int) -> void:
 #endregion
 
 
+#region AUDIO
+
+func _db_to_percent(db: float) -> float:
+	return clampf(db_to_linear(db), 0.0, 1.0) * 100.0
+
+func _percent_to_db(percent: float) -> float:
+	if percent <= 0.0:
+		return -60.0
+	return linear_to_db(clampf(percent / 100.0, 0.0, 1.0))
+
+func _refresh_audio() -> void:
+	_sound_slider.set_value_no_signal(_db_to_percent(Gm.sfx_db))
+	_music_slider.set_value_no_signal(_db_to_percent(Gm.music_db))
+	_update_audio_labels()
+
+func _update_audio_labels() -> void:
+	_sound_value.text = "%d%%" % int(round(_sound_slider.value))
+	_music_value.text = "%d%%" % int(round(_music_slider.value))
+
+func _on_sound_changed(value: float) -> void:
+	Gm.sfx_db = _percent_to_db(value)
+	Gm.apply_audio_settings()
+	_update_audio_labels()
+
+func _on_music_changed(value: float) -> void:
+	Gm.music_db = _percent_to_db(value)
+	Gm.apply_audio_settings()
+	_update_audio_labels()
+
+func _on_audio_drag_ended(_value_changed: bool) -> void:
+	Gm.save_settings()
+
+func _on_test_sound() -> void:
+	Gm.play_effect(TEST_CLICK)
+
+#endregion
+
+
 #region EXIT
 
 func _on_exit_pressed() -> void:
@@ -196,7 +246,11 @@ func _retranslate() -> void:
 	_controls_title.text = tr("CONTROLS_TITLE")
 	_video_title.text = tr("VIDEO_TITLE")
 	_audio_title.text = tr("AUDIO_TITLE")
-	for wip: Label in [_controls_wip, _video_wip, _audio_wip]:
+	_sound_label.text = tr("AUDIO_SOUND")
+	_music_label.text = tr("AUDIO_MUSIC")
+	_test_sound_button.text = tr("AUDIO_TEST")
+	_update_audio_labels()
+	for wip: Label in [_controls_wip, _video_wip]:
 		wip.text = tr("WIP")
 	_controls_back_button.text = tr("MENU_BACK")
 	_video_back_button.text = tr("MENU_BACK")
@@ -227,4 +281,9 @@ func _connect_signals() -> void:
 	for i: int in range(_slot_buttons.size()):
 		_slot_buttons[i].pressed.connect(_on_slot_pressed.bind(i + 1))
 	_language_option.item_selected.connect(_on_language_selected)
+	_sound_slider.value_changed.connect(_on_sound_changed)
+	_music_slider.value_changed.connect(_on_music_changed)
+	_sound_slider.drag_ended.connect(_on_audio_drag_ended)
+	_music_slider.drag_ended.connect(_on_audio_drag_ended)
+	_test_sound_button.pressed.connect(_on_test_sound)
 	_exit_dialog.confirmed.connect(_on_exit_confirmed)

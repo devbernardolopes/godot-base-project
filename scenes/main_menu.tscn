@@ -149,9 +149,43 @@ layout_mode = 2
 text = "Audio"
 horizontal_alignment = 1
 
-[node name="AudioWip" type="Label" parent="Center/Card/Margin/AudioPanel" unique_id=6729954]
+[node name="SoundRow" type="HBoxContainer" parent="Center/Card/Margin/AudioPanel" unique_id=1085158857]
 layout_mode = 2
-text = "Coming soon."
+theme_override_constants/separation = 8
+
+[node name="SoundLabel" type="Label" parent="Center/Card/Margin/AudioPanel/SoundRow" unique_id=1165547361]
+layout_mode = 2
+text = "Sound"
+
+[node name="SoundSlider" type="HSlider" parent="Center/Card/Margin/AudioPanel/SoundRow" unique_id=1690726374]
+layout_mode = 2
+size_flags_horizontal = 3
+value = 100.0
+
+[node name="SoundValue" type="Label" parent="Center/Card/Margin/AudioPanel/SoundRow" unique_id=662089259]
+layout_mode = 2
+text = "100%"
+
+[node name="MusicRow" type="HBoxContainer" parent="Center/Card/Margin/AudioPanel" unique_id=950714629]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MusicLabel" type="Label" parent="Center/Card/Margin/AudioPanel/MusicRow" unique_id=509510195]
+layout_mode = 2
+text = "Music"
+
+[node name="MusicSlider" type="HSlider" parent="Center/Card/Margin/AudioPanel/MusicRow" unique_id=934430249]
+layout_mode = 2
+size_flags_horizontal = 3
+value = 100.0
+
+[node name="MusicValue" type="Label" parent="Center/Card/Margin/AudioPanel/MusicRow" unique_id=617633723]
+layout_mode = 2
+text = "100%"
+
+[node name="TestSoundButton" type="Button" parent="Center/Card/Margin/AudioPanel" unique_id=998269471]
+layout_mode = 2
+text = "Test"
 
 [node name="AudioBackButton" type="Button" parent="Center/Card/Margin/AudioPanel" unique_id=1780878820]
 layout_mode = 2
