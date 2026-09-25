@@ -338,10 +338,10 @@ func _prune_sfx_pool() -> void:
 ## Idempotent: also repairs duplicates of this base whose project.godot
 ## InputMap section was lost. Called from initialize().
 func ensure_default_actions() -> void:
-	_ensure_action(&"move_up", ["W", "Up"], {"axis": Vector2.LEFT})
-	_ensure_action(&"move_down", ["S", "Down"], {"axis": Vector2.RIGHT})
-	_ensure_action(&"move_left", ["A", "Left"], {"axis": Vector2.UP})
-	_ensure_action(&"move_right", ["D", "Right"], {"axis": Vector2.DOWN})
+	_ensure_action(&"move_up", ["W", "Up"], {"axis": Vector2.UP})
+	_ensure_action(&"move_down", ["S", "Down"], {"axis": Vector2.DOWN})
+	_ensure_action(&"move_left", ["A", "Left"], {"axis": Vector2.LEFT})
+	_ensure_action(&"move_right", ["D", "Right"], {"axis": Vector2.RIGHT})
 	_ensure_action(&"jump", ["Space"], {"buttons": [JOY_BUTTON_A]})
 	_ensure_action(&"fire", ["J", "X"], {"buttons": [JOY_BUTTON_X]})
 	_ensure_action(&"dash", ["K", "Shift"], {"buttons": [JOY_BUTTON_B]})
@@ -362,7 +362,8 @@ func _ensure_action(action: StringName, keys: Array, pad: Dictionary) -> void:
 			var ev: InputEventKey = InputEventKey.new()
 			ev.physical_keycode = OS.find_keycode_from_string(key_name)
 			InputMap.action_add_event(action, ev)
-		for dir: Vector2 in pad.get("axis", []):
+		if pad.has("axis") and pad["axis"] is Vector2:
+			var dir: Vector2 = pad["axis"]
 			_add_pad_motion(action, JOY_AXIS_LEFT_X if dir.x != 0.0 else JOY_AXIS_LEFT_Y, signf(dir.x + dir.y))
 		for btn: int in pad.get("buttons", []):
 			var bev: InputEventJoypadButton = InputEventJoypadButton.new()
