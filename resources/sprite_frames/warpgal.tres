@@ -1,6 +1,10 @@
-[gd_resource type="SpriteFrames" format=3]
+[gd_resource type="SpriteFrames" format=3 uid="uid://dq1i7yk5t24wb"]
 
 [ext_resource type="Texture2D" uid="uid://xki8mtw4ly33" path="res://assets/images/actors/hero/warpgal-anim-sheet-alpha.png" id="1"]
+
+[sub_resource type="AtlasTexture" id="fall_0"]
+atlas = ExtResource("1")
+region = Rect2(0, 336, 48, 48)
 
 [sub_resource type="AtlasTexture" id="idle1_0"]
 atlas = ExtResource("1")
@@ -50,6 +54,46 @@ region = Rect2(96, 96, 48, 48)
 atlas = ExtResource("1")
 region = Rect2(144, 96, 48, 48)
 
+[sub_resource type="AtlasTexture" id="begin_0"]
+atlas = ExtResource("1")
+region = Rect2(0, 192, 48, 48)
+
+[sub_resource type="AtlasTexture" id="begin_1"]
+atlas = ExtResource("1")
+region = Rect2(48, 192, 48, 48)
+
+[sub_resource type="AtlasTexture" id="begin_2"]
+atlas = ExtResource("1")
+region = Rect2(96, 192, 48, 48)
+
+[sub_resource type="AtlasTexture" id="begin_3"]
+atlas = ExtResource("1")
+region = Rect2(144, 192, 48, 48)
+
+[sub_resource type="AtlasTexture" id="end_0"]
+atlas = ExtResource("1")
+region = Rect2(0, 288, 48, 48)
+
+[sub_resource type="AtlasTexture" id="end_1"]
+atlas = ExtResource("1")
+region = Rect2(48, 288, 48, 48)
+
+[sub_resource type="AtlasTexture" id="mid_0"]
+atlas = ExtResource("1")
+region = Rect2(0, 240, 48, 48)
+
+[sub_resource type="AtlasTexture" id="mid_1"]
+atlas = ExtResource("1")
+region = Rect2(48, 240, 48, 48)
+
+[sub_resource type="AtlasTexture" id="mid_2"]
+atlas = ExtResource("1")
+region = Rect2(96, 240, 48, 48)
+
+[sub_resource type="AtlasTexture" id="mid_3"]
+atlas = ExtResource("1")
+region = Rect2(144, 240, 48, 48)
+
 [sub_resource type="AtlasTexture" id="run_0"]
 atlas = ExtResource("1")
 region = Rect2(0, 144, 48, 48)
@@ -90,97 +134,144 @@ region = Rect2(384, 144, 48, 48)
 atlas = ExtResource("1")
 region = Rect2(432, 144, 48, 48)
 
-[sub_resource type="AtlasTexture" id="begin_0"]
-atlas = ExtResource("1")
-region = Rect2(0, 192, 48, 48)
-
-[sub_resource type="AtlasTexture" id="begin_1"]
-atlas = ExtResource("1")
-region = Rect2(48, 192, 48, 48)
-
-[sub_resource type="AtlasTexture" id="begin_2"]
-atlas = ExtResource("1")
-region = Rect2(96, 192, 48, 48)
-
-[sub_resource type="AtlasTexture" id="begin_3"]
-atlas = ExtResource("1")
-region = Rect2(144, 192, 48, 48)
-
-[sub_resource type="AtlasTexture" id="mid_0"]
-atlas = ExtResource("1")
-region = Rect2(0, 240, 48, 48)
-
-[sub_resource type="AtlasTexture" id="mid_1"]
-atlas = ExtResource("1")
-region = Rect2(48, 240, 48, 48)
-
-[sub_resource type="AtlasTexture" id="mid_2"]
-atlas = ExtResource("1")
-region = Rect2(96, 240, 48, 48)
-
-[sub_resource type="AtlasTexture" id="mid_3"]
-atlas = ExtResource("1")
-region = Rect2(144, 240, 48, 48)
-
-[sub_resource type="AtlasTexture" id="end_0"]
-atlas = ExtResource("1")
-region = Rect2(0, 288, 48, 48)
-
-[sub_resource type="AtlasTexture" id="end_1"]
-atlas = ExtResource("1")
-region = Rect2(48, 288, 48, 48)
-
-[sub_resource type="AtlasTexture" id="fall_0"]
-atlas = ExtResource("1")
-region = Rect2(0, 336, 48, 48)
-
 [resource]
 animations = [{
-"fps": 4.2,
-"loop": true,
-"name": &"idle_1",
-"speed": 1.0,
-"frames": [SubResource("idle1_0"), SubResource("idle1_1"), SubResource("idle1_2"), SubResource("idle1_3")]
-}, {
-"fps": 4.2,
-"loop": true,
-"name": &"idle_2",
-"speed": 1.0,
-"frames": [SubResource("idle2_0"), SubResource("idle2_1"), SubResource("idle2_2"), SubResource("idle2_3")]
-}, {
-"fps": 6.25,
-"loop": true,
-"name": &"idle_3",
-"speed": 1.0,
-"frames": [SubResource("idle3_0"), SubResource("idle3_1"), SubResource("idle3_2"), SubResource("idle3_3")]
-}, {
-"fps": 12.5,
-"loop": true,
-"name": &"run",
-"speed": 1.0,
-"frames": [SubResource("run_0"), SubResource("run_1"), SubResource("run_2"), SubResource("run_3"), SubResource("run_4"), SubResource("run_5"), SubResource("run_6"), SubResource("run_7"), SubResource("run_8"), SubResource("run_9")]
-}, {
-"fps": 4.2,
-"loop": false,
-"name": &"jump_begin",
-"speed": 1.0,
-"frames": [SubResource("begin_0"), SubResource("begin_1"), SubResource("begin_2"), SubResource("begin_3")]
-}, {
-"fps": 4.2,
-"loop": true,
-"name": &"jump_mid",
-"speed": 1.0,
-"frames": [SubResource("mid_0"), SubResource("mid_1"), SubResource("mid_2"), SubResource("mid_3")]
-}, {
-"fps": 8.0,
-"loop": false,
-"name": &"jump_end",
-"speed": 1.0,
-"frames": [SubResource("end_0"), SubResource("end_1")]
-}, {
-"fps": 4.2,
-"loop": true,
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("fall_0")
+}],
+"loop": 1,
 "name": &"fall",
-"speed": 1.0,
-"frames": [SubResource("fall_0")]
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("idle1_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle1_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle1_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle1_3")
+}],
+"loop": 1,
+"name": &"idle_1",
+"speed": 4.2
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("idle2_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle2_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle2_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle2_3")
+}],
+"loop": 1,
+"name": &"idle_2",
+"speed": 4.2
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("idle3_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle3_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle3_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle3_3")
+}],
+"loop": 1,
+"name": &"idle_3",
+"speed": 4.2
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("begin_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("begin_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("begin_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("begin_3")
+}],
+"loop": 0,
+"name": &"jump_begin",
+"speed": 6.25
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("end_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("end_1")
+}],
+"loop": 0,
+"name": &"jump_end",
+"speed": 6.25
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("mid_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("mid_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("mid_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("mid_3")
+}],
+"loop": 1,
+"name": &"jump_mid",
+"speed": 6.25
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("run_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_5")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_6")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_7")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_8")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_9")
+}],
+"loop": 1,
+"name": &"run",
+"speed": 6.25
 }]

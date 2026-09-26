@@ -104,6 +104,12 @@ map={
 ]
 }
 
+[internationalization]
+
+locale/translations=["res://resources/i18n/translations.en.translation"]
+locale/locale_filter_mode=0
+locale/fallback_locale="en"
+
 [layer_names]
 
 2d_physics/layer_1="WorldSolid"
@@ -112,12 +118,6 @@ map={
 2d_physics/layer_4="PlayerProjectile"
 2d_physics/layer_5="EnemyProjectile"
 2d_physics/layer_6="PickupTrigger"
-
-[internationalization]
-
-locale/translations=["res://resources/i18n/translations.en.translation"]
-locale/locale_filter_mode=0
-locale/fallback_locale="en"
 
 [physics]
 
