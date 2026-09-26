@@ -154,12 +154,14 @@ func _input(event: InputEvent) -> void:
 	# the GUI) so pad buttons can't double-trigger via builtin ui_accept.
 	# Pad buttons are stripped from ui_accept/ui_cancel at boot (see Gm), so
 	# the game actions own pad confirm/cancel outright.
+	# NOTE: mark handled BEFORE activating: activation may synchronously
+	# switch scenes (slot select), after which this node has no viewport.
 	if event.is_action_pressed("fire"):
+		get_viewport().set_input_as_handled()
 		_on_cancel_pressed()
-		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("jump"):
-		_activate_focused()
 		get_viewport().set_input_as_handled()
+		_activate_focused()
 
 
 func _unhandled_input(event: InputEvent) -> void:

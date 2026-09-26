@@ -415,6 +415,7 @@ func _ensure_single_binding(action: StringName) -> void:
 		InputMap.action_add_event(action, key_ev)
 		var bev: InputEventJoypadButton = InputEventJoypadButton.new()
 		bev.button_index = int(PAD_DEFAULTS.get(action, 0)) as JoyButton
+		bev.device = -1  # Any remote: hid-wiimote remotes often enumerate past device 0.
 		InputMap.action_add_event(action, bev)
 		_attach_stick_if_move(action)
 
@@ -428,6 +429,7 @@ func _add_pad_motion(action: StringName, axis: JoyAxis, value: float) -> void:
 	var ev: InputEventJoypadMotion = InputEventJoypadMotion.new()
 	ev.axis = axis
 	ev.axis_value = value
+	ev.device = -1  # Any remote (see _ensure_single_binding).
 	InputMap.action_add_event(action, ev)
 
 ## Builtin ui_accept natively includes joy button 0 and ui_cancel includes joy
@@ -525,6 +527,7 @@ func set_action_button(action: StringName, ev: InputEventJoypadButton) -> void:
 		if old is InputEventJoypadButton:
 			InputMap.action_erase_event(action, old)
 	if ev != null:
+		ev.device = -1  # Bindings work with any remote, not just the one used to bind.
 		InputMap.action_add_event(action, ev)
 
 ## Steal rule: clear the same-column binding on every OTHER action.
@@ -570,7 +573,8 @@ func describe_input_event(ev: InputEvent) -> String:
 		var code: int = int(k.physical_keycode if k.physical_keycode != 0 else k.keycode)
 		return "key %s (phys %d)" % [OS.get_keycode_string(code as Key), code]
 	if ev is InputEventJoypadButton:
-		return "pad btn %d" % int((ev as InputEventJoypadButton).button_index)
+		var b: InputEventJoypadButton = ev as InputEventJoypadButton
+		return "pad btn %d dev %d" % [int(b.button_index), b.device]
 	if ev is InputEventJoypadMotion:
 		var m: InputEventJoypadMotion = ev as InputEventJoypadMotion
 		return "axis %d = %.2f" % [int(m.axis), float(m.axis_value)]
@@ -585,7 +589,8 @@ func _event_to_dict(ev: InputEvent) -> Dictionary:
 		var k: InputEventKey = ev as InputEventKey
 		return {"type": "key", "code": int(k.physical_keycode if k.physical_keycode != 0 else k.keycode)}
 	if ev is InputEventJoypadButton:
-		return {"type": "button", "index": int((ev as InputEventJoypadButton).button_index)}
+		var b: InputEventJoypadButton = ev as InputEventJoypadButton
+		return {"type": "button", "index": int(b.button_index), "device": b.device}
 	if ev is InputEventJoypadMotion:
 		var m: InputEventJoypadMotion = ev as InputEventJoypadMotion
 		return {"type": "axis", "axis": int(m.axis), "value": float(m.axis_value)}
@@ -602,6 +607,7 @@ func _dict_to_event(d: Dictionary) -> InputEvent:
 		"button":
 			var b: InputEventJoypadButton = InputEventJoypadButton.new()
 			b.button_index = int(d.get("index", 0)) as JoyButton
+			b.device = int(d.get("device", -1))
 			return b
 		"axis":
 			var m: InputEventJoypadMotion = InputEventJoypadMotion.new()
