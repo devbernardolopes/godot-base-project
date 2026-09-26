@@ -104,6 +104,15 @@ map={
 ]
 }
 
+[layer_names]
+
+2d_physics/layer_1="WorldSolid"
+2d_physics/layer_2="Player"
+2d_physics/layer_3="Enemies"
+2d_physics/layer_4="PlayerProjectile"
+2d_physics/layer_5="EnemyProjectile"
+2d_physics/layer_6="PickupTrigger"
+
 [internationalization]
 
 locale/translations=["res://resources/i18n/translations.en.translation"]

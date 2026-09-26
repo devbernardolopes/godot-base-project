@@ -43,6 +43,8 @@ const ACTION_I18N: Dictionary = {
 }
 const LISTEN_ARM_MSEC: int = 200
 
+const GAME_SCENE: String = "res://scenes/playground/test_movement.tscn"
+
 var _listening_action: StringName = &""
 var _listen_start_msec: int = 0
 var _row_box: Dictionary = {}
@@ -218,9 +220,10 @@ func _on_slot_pressed(slot: int) -> void:
 	var data: Dictionary = Gm.get_slot_data(slot)
 	if data.is_empty():
 		data = Gm.new_slot_data()
-		Gm.save_slot(slot, data)
-	# Per-game hook: starting gameplay from the selected slot happens here.
+	data["scene_to_resume"] = GAME_SCENE
+	Gm.save_slot(slot, data)
 	_refresh_slots()
+	get_tree().change_scene_to_file(GAME_SCENE)
 
 #endregion
 
