@@ -44,10 +44,8 @@ func _process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"menu"):
 		_exit_to_menu()
-		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(&"map"):
 		set_ability_unlocked(DEMO_ABILITY, not is_ability_unlocked(DEMO_ABILITY))
-		get_viewport().set_input_as_handled()
 
 
 func _on_player_fired(origin: Vector2, direction: int) -> void:

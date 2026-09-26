@@ -4,7 +4,7 @@ extends Control
 ## Single scene, panel switching: Main / Slots / Settings hub / Controls /
 ## Video / Audio. Back-stack navigation, first-button focus for
 ## gamepad/keyboard, Esc = back (exit-confirm on Main), Exit hidden on
-## web/mobile. Fire = confirm, Jump = cancel in menus.
+## web/mobile. Jump (Wii 2) = confirm, Fire (Wii 1) = cancel/back in menus.
 
 const PANEL_MAIN: StringName = &"MainPanel"
 const PANEL_SLOTS: StringName = &"SlotsPanel"
@@ -150,12 +150,14 @@ func _input(event: InputEvent) -> void:
 	if _listening_action != &"":
 		_capture_remap(event)
 		return
-	# Fire = confirm, Jump = cancel. Handled here (before the GUI) so the
-	# Jump pad button can't double-trigger via builtin ui_accept.
-	if event.is_action_pressed("jump"):
+	# Jump (Wii 2) = confirm, Fire (Wii 1) = cancel/back. Handled here (before
+	# the GUI) so pad buttons can't double-trigger via builtin ui_accept.
+	# Pad buttons are stripped from ui_accept/ui_cancel at boot (see Gm), so
+	# the game actions own pad confirm/cancel outright.
+	if event.is_action_pressed("fire"):
 		_on_cancel_pressed()
 		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("fire"):
+	elif event.is_action_pressed("jump"):
 		_activate_focused()
 		get_viewport().set_input_as_handled()
 
@@ -165,7 +167,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed("menu"):
 		_on_cancel_pressed()
-		get_viewport().set_input_as_handled()
 
 
 #region NAVIGATION
@@ -440,6 +441,16 @@ func _on_reset_controls() -> void:
 	_refresh_controls()
 
 func _activate_focused() -> void:
+	# The exit dialog lives in its own Window/viewport, so the main
+	# viewport's focus owner can't reach it: confirm inside the dialog's
+	# own viewport, falling back to OK when nothing there has focus.
+	if _exit_dialog.visible:
+		var dlg_focus: Control = _exit_dialog.get_viewport().gui_get_focus_owner()
+		if dlg_focus is Button and dlg_focus.visible and not (dlg_focus as Button).disabled:
+			(dlg_focus as Button).pressed.emit()
+		else:
+			_exit_dialog.get_ok_button().pressed.emit()
+		return
 	var focus: Control = get_viewport().gui_get_focus_owner()
 	if focus is Button and focus.visible and not (focus as Button).disabled:
 		(focus as Button).pressed.emit()
@@ -462,6 +473,7 @@ func _on_exit_pressed() -> void:
 		return
 	_retranslate_exit_dialog()
 	_exit_dialog.popup_centered()
+	_exit_dialog.get_ok_button().grab_focus()
 
 func _on_exit_confirmed() -> void:
 	get_tree().quit()

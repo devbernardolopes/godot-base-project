@@ -141,6 +141,8 @@ const _SFX_POOL_SIZE: int = 8
 func initialize() -> void:
 	ensure_default_actions()
 	load_settings()
+	_repair_empty_actions()
+	_sanitize_builtin_ui_actions()
 	apply_audio_settings()
 	apply_video_settings()
 	apply_locale()
@@ -428,6 +430,29 @@ func _add_pad_motion(action: StringName, axis: JoyAxis, value: float) -> void:
 	ev.axis_value = value
 	InputMap.action_add_event(action, ev)
 
+## Builtin ui_accept natively includes joy button 0 and ui_cancel includes joy
+## button 1, which would double-trigger (or fight) the menu confirm/cancel
+## mapping owned by the game actions. Strip pad input from those two builtin
+## actions only: keys, mouse and all dpad/stick focus navigation stay intact.
+func _sanitize_builtin_ui_actions() -> void:
+	for action: StringName in [&"ui_accept", &"ui_cancel"]:
+		if not InputMap.has_action(action):
+			continue
+		for ev: InputEvent in InputMap.action_get_events(action):
+			if ev is InputEventJoypadButton or ev is InputEventJoypadMotion:
+				InputMap.action_erase_event(action, ev)
+
+## Self-heal: any game action left with neither key nor button (e.g. a stale
+## empty slot) falls back to defaults so the pad never dies across runs.
+## Stick axes alone do not count as bound.
+func _repair_empty_actions() -> void:
+	for action: StringName in GAME_ACTIONS:
+		if get_action_key(action) == null and get_action_button(action) == null:
+			push_warning("Controls for '%s' were empty, restoring defaults." % String(action))
+			if InputMap.has_action(action):
+				InputMap.action_erase_events(action)
+			_ensure_single_binding(action)
+
 #region controls persistence (remap screen in Step 5 builds on this)
 
 func _save_controls_to_cfg(cfg: ConfigFile) -> void:
@@ -452,6 +477,9 @@ func _load_controls_from_cfg(cfg: ConfigFile) -> void:
 		var slot: Variant = cfg.get_value("controls", String(action), {})
 		if typeof(slot) != TYPE_DICTIONARY:
 			continue  # Pre-1.1 blob: ignore, fresh defaults stand.
+		var slot_dict: Dictionary = slot as Dictionary
+		if (slot_dict.get("key", {}) as Dictionary).is_empty() and (slot_dict.get("button", {}) as Dictionary).is_empty():
+			continue  # Empty slot: keep the defaults ensured before load.
 		if not InputMap.has_action(action):
 			InputMap.add_action(action)
 		InputMap.action_erase_events(action)
