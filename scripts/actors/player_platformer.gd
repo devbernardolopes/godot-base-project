@@ -14,6 +14,9 @@ const ANIM_MID: StringName = &"jump_mid"
 const ANIM_END: StringName = &"jump_end"
 const ANIM_FALL: StringName = &"fall"
 const ANIM_CROUCH: StringName = &"crouch"
+const ANIM_CROUCH_FIRE: StringName = &"crouch_fire"
+const ANIM_STAND_FIRE: StringName = &"stand_fire"
+const ANIM_STAND_FIRE_UP: StringName = &"stand_fire_up"
 
 ## Upward speed (px/s) below which the jump arc counts as rising.
 const RISE_THRESHOLD: float = -20.0
@@ -26,6 +29,9 @@ const ANIM_STATES: Dictionary = {
 	&"jump_end": {"loop": false, "next": &"fall"},
 	&"fall": {"loop": true, "next": &""},
 	&"crouch": {"loop": true, "next": &""},
+	&"crouch_fire": {"loop": true, "next": &""},
+	&"stand_fire": {"loop": true, "next": &""},
+	&"stand_fire_up": {"loop": true, "next": &""},
 }
 
 @export var move_speed: float = 140.0
@@ -131,7 +137,16 @@ func _update_anim() -> void:
 	if on_floor:
 		_jumped = false
 		if Input.is_action_pressed(&"move_down"):
-			anim.request(ANIM_CROUCH)
+			if Input.is_action_pressed(&"fire"):
+				anim.request(ANIM_CROUCH_FIRE)
+			else:
+				anim.request(ANIM_CROUCH)
+			return
+		if not _moving and Input.is_action_pressed(&"fire"):
+			if Input.is_action_pressed(&"move_up"):
+				anim.request(ANIM_STAND_FIRE_UP)
+			else:
+				anim.request(ANIM_STAND_FIRE)
 			return
 		anim.request(ANIM_RUN if _moving else ANIM_IDLE)
 		return
