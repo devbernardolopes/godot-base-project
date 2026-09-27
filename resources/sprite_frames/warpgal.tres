@@ -1,6 +1,7 @@
 [gd_resource type="SpriteFrames" format=3 uid="uid://dq1i7yk5t24wb"]
 
 [ext_resource type="Texture2D" uid="uid://xki8mtw4ly33" path="res://assets/images/actors/hero/warpgal-anim-sheet-alpha.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://dpripkb7qlty2" path="res://assets/images/actors/hero/warpgal-shooting-sheet-alpha.png" id="2"]
 
 [sub_resource type="AtlasTexture" id="fall_0"]
 atlas = ExtResource("1")
@@ -133,6 +134,122 @@ region = Rect2(384, 144, 48, 48)
 [sub_resource type="AtlasTexture" id="run_9"]
 atlas = ExtResource("1")
 region = Rect2(432, 144, 48, 48)
+
+[sub_resource type="AtlasTexture" id="crouch_0"]
+atlas = ExtResource("2")
+region = Rect2(48, 384, 48, 48)
+
+[sub_resource type="AtlasTexture" id="crouch_fire_0"]
+atlas = ExtResource("2")
+region = Rect2(48, 432, 48, 48)
+
+[sub_resource type="AtlasTexture" id="stand_fire_0"]
+atlas = ExtResource("2")
+region = Rect2(0, 432, 48, 48)
+
+[sub_resource type="AtlasTexture" id="stand_fire_up_0"]
+atlas = ExtResource("2")
+region = Rect2(0, 816, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_0"]
+atlas = ExtResource("2")
+region = Rect2(96, 432, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_1"]
+atlas = ExtResource("2")
+region = Rect2(144, 432, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_2"]
+atlas = ExtResource("2")
+region = Rect2(192, 432, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_3"]
+atlas = ExtResource("2")
+region = Rect2(240, 432, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_4"]
+atlas = ExtResource("2")
+region = Rect2(288, 432, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_5"]
+atlas = ExtResource("2")
+region = Rect2(336, 432, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_6"]
+atlas = ExtResource("2")
+region = Rect2(384, 432, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_7"]
+atlas = ExtResource("2")
+region = Rect2(432, 432, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_8"]
+atlas = ExtResource("2")
+region = Rect2(480, 432, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_9"]
+atlas = ExtResource("2")
+region = Rect2(528, 432, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_up_0"]
+atlas = ExtResource("2")
+region = Rect2(96, 624, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_up_1"]
+atlas = ExtResource("2")
+region = Rect2(144, 624, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_up_2"]
+atlas = ExtResource("2")
+region = Rect2(192, 624, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_up_3"]
+atlas = ExtResource("2")
+region = Rect2(240, 624, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_up_4"]
+atlas = ExtResource("2")
+region = Rect2(288, 624, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_up_5"]
+atlas = ExtResource("2")
+region = Rect2(336, 624, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_up_6"]
+atlas = ExtResource("2")
+region = Rect2(384, 624, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_up_7"]
+atlas = ExtResource("2")
+region = Rect2(432, 624, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_up_8"]
+atlas = ExtResource("2")
+region = Rect2(480, 624, 48, 48)
+
+[sub_resource type="AtlasTexture" id="run_fire_up_9"]
+atlas = ExtResource("2")
+region = Rect2(528, 624, 48, 48)
+
+[sub_resource type="AtlasTexture" id="air_fire_0"]
+atlas = ExtResource("2")
+region = Rect2(144, 432, 48, 48)
+
+[sub_resource type="AtlasTexture" id="air_fire_down_0"]
+atlas = ExtResource("2")
+region = Rect2(144, 48, 48, 48)
+
+[sub_resource type="AtlasTexture" id="air_fire_up_0"]
+atlas = ExtResource("2")
+region = Rect2(144, 816, 48, 48)
+
+[sub_resource type="AtlasTexture" id="air_fire_down_diagonal_0"]
+atlas = ExtResource("2")
+region = Rect2(144, 240, 48, 48)
+
+[sub_resource type="AtlasTexture" id="air_fire_up_diagonal_0"]
+atlas = ExtResource("2")
+region = Rect2(144, 624, 48, 48)
 
 [resource]
 animations = [{
@@ -274,4 +391,146 @@ animations = [{
 "loop": 1,
 "name": &"run",
 "speed": 6.25
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("crouch_0")
+}],
+"loop": 1,
+"name": &"crouch",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("crouch_fire_0")
+}],
+"loop": 1,
+"name": &"crouch_fire",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("stand_fire_0")
+}],
+"loop": 1,
+"name": &"stand_fire",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("stand_fire_up_0")
+}],
+"loop": 1,
+"name": &"stand_fire_up",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("run_fire_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_fire_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_fire_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_fire_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_fire_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_fire_5")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_fire_6")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_fire_7")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_fire_8")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_fire_9")
+}],
+"loop": 1,
+"name": &"run_fire",
+"speed": 6.25
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("run_fire_up_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_fire_up_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_fire_up_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_fire_up_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_fire_up_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_fire_up_5")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_fire_up_6")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_fire_up_7")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_fire_up_8")
+}, {
+"duration": 1.0,
+"texture": SubResource("run_fire_up_9")
+}],
+"loop": 1,
+"name": &"run_fire_up",
+"speed": 6.25
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("air_fire_0")
+}],
+"loop": 1,
+"name": &"air_fire",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("air_fire_down_0")
+}],
+"loop": 1,
+"name": &"air_fire_down",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("air_fire_up_0")
+}],
+"loop": 1,
+"name": &"air_fire_up",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("air_fire_down_diagonal_0")
+}],
+"loop": 1,
+"name": &"air_fire_down_diagonal",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("air_fire_up_diagonal_0")
+}],
+"loop": 1,
+"name": &"air_fire_up_diagonal",
+"speed": 1.0
 }]
