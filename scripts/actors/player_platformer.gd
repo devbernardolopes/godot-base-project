@@ -17,6 +17,13 @@ const ANIM_CROUCH: StringName = &"crouch"
 const ANIM_CROUCH_FIRE: StringName = &"crouch_fire"
 const ANIM_STAND_FIRE: StringName = &"stand_fire"
 const ANIM_STAND_FIRE_UP: StringName = &"stand_fire_up"
+const ANIM_RUN_FIRE: StringName = &"run_fire"
+const ANIM_RUN_FIRE_UP: StringName = &"run_fire_up"
+const ANIM_AIR_FIRE: StringName = &"air_fire"
+const ANIM_AIR_FIRE_DOWN: StringName = &"air_fire_down"
+const ANIM_AIR_FIRE_UP: StringName = &"air_fire_up"
+const ANIM_AIR_FIRE_DOWN_DIAG: StringName = &"air_fire_down_diagonal"
+const ANIM_AIR_FIRE_UP_DIAG: StringName = &"air_fire_up_diagonal"
 
 ## Upward speed (px/s) below which the jump arc counts as rising.
 const RISE_THRESHOLD: float = -20.0
@@ -32,6 +39,13 @@ const ANIM_STATES: Dictionary = {
 	&"crouch_fire": {"loop": true, "next": &""},
 	&"stand_fire": {"loop": true, "next": &""},
 	&"stand_fire_up": {"loop": true, "next": &""},
+	&"run_fire": {"loop": true, "next": &""},
+	&"run_fire_up": {"loop": true, "next": &""},
+	&"air_fire": {"loop": true, "next": &""},
+	&"air_fire_down": {"loop": true, "next": &""},
+	&"air_fire_up": {"loop": true, "next": &""},
+	&"air_fire_down_diagonal": {"loop": true, "next": &""},
+	&"air_fire_up_diagonal": {"loop": true, "next": &""},
 }
 
 @export var move_speed: float = 140.0
@@ -142,13 +156,44 @@ func _update_anim() -> void:
 			else:
 				anim.request(ANIM_CROUCH)
 			return
-		if not _moving and Input.is_action_pressed(&"fire"):
-			if Input.is_action_pressed(&"move_up"):
-				anim.request(ANIM_STAND_FIRE_UP)
+		if Input.is_action_pressed(&"fire"):
+			if _moving:
+				if Input.is_action_pressed(&"move_up"):
+					anim.request_synced(ANIM_RUN_FIRE_UP)
+				else:
+					anim.request_synced(ANIM_RUN_FIRE)
 			else:
-				anim.request(ANIM_STAND_FIRE)
+				if Input.is_action_pressed(&"move_up"):
+					anim.request(ANIM_STAND_FIRE_UP)
+				else:
+					anim.request(ANIM_STAND_FIRE)
 			return
-		anim.request(ANIM_RUN if _moving else ANIM_IDLE)
+		if _moving:
+			if anim.current_state == ANIM_RUN_FIRE or anim.current_state == ANIM_RUN_FIRE_UP:
+				anim.request_synced(ANIM_RUN)
+			else:
+				anim.request(ANIM_RUN)
+			return
+		anim.request(ANIM_IDLE)
+		return
+	if Input.is_action_pressed(&"fire"):
+		_jumped = false
+		var up: bool = Input.is_action_pressed(&"move_up")
+		var down: bool = Input.is_action_pressed(&"move_down")
+		if up and _moving:
+			anim.request(ANIM_AIR_FIRE_UP_DIAG)
+		elif down and _moving:
+			anim.request(ANIM_AIR_FIRE_DOWN_DIAG)
+		elif up:
+			anim.request(ANIM_AIR_FIRE_UP)
+		elif down:
+			anim.request(ANIM_AIR_FIRE_DOWN)
+		else:
+			anim.request(ANIM_AIR_FIRE)
+		return
+	if anim.current_state == ANIM_AIR_FIRE or anim.current_state == ANIM_AIR_FIRE_DOWN or anim.current_state == ANIM_AIR_FIRE_UP or anim.current_state == ANIM_AIR_FIRE_DOWN_DIAG or anim.current_state == ANIM_AIR_FIRE_UP_DIAG:
+		_jumped = false
+		anim.request(ANIM_FALL)
 		return
 	if just_left and _jumped:
 		anim.request(ANIM_BEGIN)

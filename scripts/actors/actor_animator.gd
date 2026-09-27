@@ -31,6 +31,23 @@ func request(state: StringName) -> void:
 	play(state)
 
 
+## Same as request() but carries the current frame index (and intra-frame
+## progress) into the new animation, modulo its frame count. Used for
+## run <-> run_fire handoffs so the gun pose stays in stride with the legs.
+func request_synced(state: StringName) -> void:
+	if state == &"" or state == current_state:
+		return
+	var idx: int = frame
+	var prog: float = frame_progress
+	current_state = state
+	play(state)
+	var frames: SpriteFrames = sprite_frames
+	if frames != null and frames.has_animation(state):
+		var count: int = frames.get_frame_count(state)
+		if count > 0:
+			set_frame_and_progress(idx % count, prog)
+
+
 func set_facing(dir: int) -> void:
 	if dir != 0:
 		flip_h = dir < 0
