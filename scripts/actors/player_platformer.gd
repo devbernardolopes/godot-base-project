@@ -13,6 +13,7 @@ const ANIM_BEGIN: StringName = &"jump_begin"
 const ANIM_MID: StringName = &"jump_mid"
 const ANIM_END: StringName = &"jump_end"
 const ANIM_FALL: StringName = &"fall"
+const ANIM_CROUCH: StringName = &"crouch"
 
 ## Upward speed (px/s) below which the jump arc counts as rising.
 const RISE_THRESHOLD: float = -20.0
@@ -24,6 +25,7 @@ const ANIM_STATES: Dictionary = {
 	&"jump_mid": {"loop": true, "next": &""},
 	&"jump_end": {"loop": false, "next": &"fall"},
 	&"fall": {"loop": true, "next": &""},
+	&"crouch": {"loop": true, "next": &""},
 }
 
 @export var move_speed: float = 140.0
@@ -95,6 +97,9 @@ func _tick(delta: float, gravity: float) -> void:
 	if is_zero_approx(axis):
 		rate = friction if is_on_floor() else air_accel * 0.4
 		target = 0.0
+	if is_on_floor() and Input.is_action_pressed(&"move_down"):
+		rate = friction
+		target = 0.0
 	velocity.x = move_toward(velocity.x, target, rate * delta)
 	if is_on_floor():
 		if _buffer > 0.0:
@@ -125,6 +130,9 @@ func _update_anim() -> void:
 	_was_on_floor = on_floor
 	if on_floor:
 		_jumped = false
+		if Input.is_action_pressed(&"move_down"):
+			anim.request(ANIM_CROUCH)
+			return
 		anim.request(ANIM_RUN if _moving else ANIM_IDLE)
 		return
 	if just_left and _jumped:
